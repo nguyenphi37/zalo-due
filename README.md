@@ -1,5 +1,62 @@
 # Zalo Due
 
+[Tiếng Việt](#tiếng-việt) · [English](#english)
+
+## Tiếng Việt
+
+Chạy nhiều tài khoản Zalo PC cùng lúc trên Windows. Mỗi tài khoản có cửa sổ, đăng nhập và file riêng. Zalo vẫn là bản chính thức và vẫn tự cập nhật.
+
+Zalo Due không sửa chương trình Zalo. Nó chỉ cho mỗi tài khoản một thư mục dữ liệu riêng để các bản chạy song song.
+
+### Tải về và dùng
+
+Vào [Releases](../../releases), tải `Zalo.Due.exe`, rồi mở file đó. Không cần cài Python hay Visual Studio.
+
+- Lần đầu mở, app tự tải Zalo bản chính thức. Cần có mạng.
+- Bấm thêm tài khoản, quét mã QR bằng điện thoại.
+- Mỗi tài khoản là một cửa sổ Zalo riêng, mở cùng lúc không đè nhau.
+- Tài khoản, tin nhắn và file nằm trong thư mục `data` cạnh file exe. File exe tải về không chứa tài khoản của ai.
+
+Muốn app chạy nền: bấm X để ẩn xuống khay. Bấm chuột phải vào icon khay để hiện lại. Trong Cài đặt có **Khởi động cùng Windows**, và mỗi tài khoản có công tắc **Mở cùng máy**.
+
+Cần có [Microsoft Edge WebView2](https://developer.microsoft.com/microsoft-edge/webview2/). Windows hiện tại thường đã có sẵn.
+
+### Chạy từ mã nguồn
+
+Cần Python 3.11 trở lên và Visual Studio 2022 Build Tools, workload **Desktop development with C++**.
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\Due.cmd
+```
+
+`Due.cmd` tự biên dịch phần native lần đầu, rồi mở Zalo Due.
+
+Đóng gói ra file exe:
+
+```powershell
+.\native\build.cmd
+.\.venv\Scripts\pyinstaller --noconfirm "Zalo Due.spec"
+```
+
+File thành phẩm là `dist\Zalo Due.exe`.
+
+### Cách các tài khoản tách nhau
+
+- Một bản Zalo chính thức dùng chung. Cập nhật một lần, mọi tài khoản đều được.
+- Mỗi tài khoản một thư mục riêng cho dữ liệu app, tài liệu và file tải về, nên đăng nhập không bao giờ đè lên nhau.
+- Khóa "chỉ mở một cửa sổ" được tách theo từng tài khoản, nên các cửa sổ chạy cùng lúc.
+- Tiến trình Zalo mới, kể cả tiến trình cơ sở dữ liệu chạy nền, đều được tách theo.
+
+### Lưu ý
+
+- Tài khoản, cài đặt và bản Zalo đã tải nằm trong thư mục `data` cạnh app. Thư mục này chỉ ở máy bạn, không nằm trong repo.
+- Phần native dùng [Microsoft Detours](https://github.com/microsoft/Detours), đặt ở `third_party/Detours-4.0.1` (giấy phép MIT).
+- Zalo là sản phẩm của VNG Corporation. Dự án này là trình chạy độc lập, không liên kết với VNG.
+
+## English
+
 Run several Zalo PC accounts at the same time on Windows. Each account keeps its own window, login, and files. Zalo itself stays the official build and updates normally.
 
 Zalo Due does not modify the Zalo program. It only gives every account a separate data folder and lets those copies run side by side.
