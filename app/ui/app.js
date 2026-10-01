@@ -715,8 +715,8 @@ if (preview) {
     };
     mock.accounts = [
       {
-        id: "phi",
-        name: "phi",
+        id: "account-1",
+        name: "Tài khoản 1",
         running: true,
         saving: false,
         openWithWindows: true,
@@ -729,11 +729,11 @@ if (preview) {
         media: 0,
         other: 844 * 1024,
         zaloLocation: "Windows (C:)",
-        path: "data\\profiles\\phi",
+        path: "data\\profiles\\account-1",
       },
       {
-        id: "day",
-        name: "day",
+        id: "account-2",
+        name: "Tài khoản 2",
         running: false,
         saving: false,
         icon: "",

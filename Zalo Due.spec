@@ -1,10 +1,19 @@
 # -*- mode: python ; coding: utf-8 -*-
+from pathlib import Path
 from PyInstaller.utils.hooks import collect_all
+
+native_helpers = [
+    (f'native/build/{arch}/{name}', f'native/build/{arch}')
+    for arch in ('x86', 'x64')
+    for name in ('DueHook.dll', 'DueLaunch.exe', 'DueProbe.exe')
+]
+for source, _ in native_helpers:
+    if not Path(source).is_file() or Path(source).stat().st_size == 0:
+        raise SystemExit(f'Missing or empty native helper: {source}')
 
 datas = [
     ('app/ui', 'ui'),
-    ('native/build/x86', 'native/build/x86'),
-    ('native/build/x64', 'native/build/x64'),
+    *native_helpers,
     ('assets/zalo.ico', 'assets'),
 ]
 binaries = []

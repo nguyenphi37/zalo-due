@@ -51,6 +51,7 @@ File thành phẩm là `dist\Zalo Due.exe`.
 
 ### Lưu ý
 
+- Cuộc gọi thoại/video khi chạy nhiều tài khoản hiện chưa được xác minh hoạt động ổn định; có báo cáo không nhận được cuộc gọi. Bản phát hành này chưa sửa lỗi cuộc gọi.
 - Tài khoản, cài đặt và bản Zalo đã tải nằm trong thư mục `data` cạnh app. Thư mục này chỉ ở máy bạn, không nằm trong repo.
 - Phần native dùng [Microsoft Detours](https://github.com/microsoft/Detours), đặt ở `third_party/Detours-4.0.1` (giấy phép MIT).
 - Zalo là sản phẩm của VNG Corporation. Dự án này là trình chạy độc lập, không liên kết với VNG.
@@ -96,6 +97,7 @@ The result is `dist\Zalo Due.exe`.
 
 ## Notes
 
+- Voice/video calls with multiple accounts are not verified as reliable; incoming-call failures have been reported. This release does not fix calling.
 - Accounts, settings, and the downloaded Zalo live in a `data` folder next to the app. That folder is local and is not part of this repository.
 - The native helper links against [Microsoft Detours](https://github.com/microsoft/Detours), included under `third_party/Detours-4.0.1` (MIT license).
 - Zalo is a product of VNG Corporation. This project is an independent launcher and is not affiliated with VNG.

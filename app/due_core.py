@@ -32,12 +32,7 @@ def app_dir() -> Path:
 
 def bundle_root() -> Path:
     if getattr(sys, "frozen", False):
-        root = Path(getattr(sys, "_MEIPASS"))
-        # PyInstaller 6 extracts bundled files into _MEIPASS/_internal.
-        internal = root / "_internal"
-        if (internal / "native" / "build").exists():
-            return internal
-        return root
+        return Path(getattr(sys, "_MEIPASS"))
     return SOURCE_ROOT
 
 
@@ -1375,13 +1370,7 @@ class DueCore:
                 if not source.exists():
                     raise DueError("Due chưa được biên dịch")
                 target = destination / name
-                # mtime can move backwards across rebuilds, so compare size too.
-                stale = (
-                    not target.exists()
-                    or source.stat().st_mtime != target.stat().st_mtime
-                    or source.stat().st_size != target.stat().st_size
-                )
-                if stale:
+                if not target.exists() or source.stat().st_mtime > target.stat().st_mtime:
                     try:
                         shutil.copy2(source, target)
                     except OSError:
@@ -1657,7 +1646,6 @@ class DueCore:
             saving = set(self._saving)
             job = self.job
             error = self.last_error
-            self.last_error = None
             settings = dict(self.settings)
             idle_since = dict(self._idle_since)
             latest = self._latest
