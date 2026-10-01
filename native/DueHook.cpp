@@ -52,6 +52,10 @@ using CreateMutexW_t = HANDLE(WINAPI*)(LPSECURITY_ATTRIBUTES, BOOL, LPCWSTR);
 using CreateMutexExW_t = HANDLE(WINAPI*)(LPSECURITY_ATTRIBUTES, LPCWSTR, DWORD, DWORD);
 using OpenMutexW_t = HANDLE(WINAPI*)(DWORD, BOOL, LPCWSTR);
 using CreateFileW_t = HANDLE(WINAPI*)(LPCWSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTES, DWORD, DWORD, HANDLE);
+using CreateFileA_t = HANDLE(WINAPI*)(LPCSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTES, DWORD, DWORD, HANDLE);
+using CreateNamedPipeW_t = HANDLE(WINAPI*)(LPCWSTR, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, LPSECURITY_ATTRIBUTES);
+using CreateNamedPipeA_t = HANDLE(WINAPI*)(LPCSTR, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, LPSECURITY_ATTRIBUTES);
+using WaitNamedPipeW_t = BOOL(WINAPI*)(LPCWSTR, DWORD);
 using CreateProcessW_t = BOOL(WINAPI*)(LPCWSTR, LPWSTR, LPSECURITY_ATTRIBUTES, LPSECURITY_ATTRIBUTES,
                                        BOOL, DWORD, LPVOID, LPCWSTR, LPSTARTUPINFOW, LPPROCESS_INFORMATION);
 using ShellNotify_t = BOOL(WINAPI*)(DWORD, void*);
@@ -62,6 +66,10 @@ CreateMutexW_t TrueCreateMutexW = nullptr;
 CreateMutexExW_t TrueCreateMutexExW = nullptr;
 OpenMutexW_t TrueOpenMutexW = nullptr;
 CreateFileW_t TrueCreateFileW = nullptr;
+CreateFileA_t TrueCreateFileA = nullptr;
+CreateNamedPipeW_t TrueCreateNamedPipeW = nullptr;
+CreateNamedPipeA_t TrueCreateNamedPipeA = nullptr;
+WaitNamedPipeW_t TrueWaitNamedPipeW = nullptr;
 CreateProcessW_t TrueCreateProcessW = nullptr;
 ShellNotify_t TrueShell_NotifyIconW = nullptr;
 ShellNotify_t TrueShell_NotifyIconA = nullptr;
@@ -315,20 +323,69 @@ HANDLE WINAPI MineOpenMutexW(DWORD access, BOOL inherit, LPCWSTR name) {
     return TrueOpenMutexW(access, inherit, Suffixed(name, storage));
 }
 
+bool CallPipeName(LPCWSTR name, std::wstring& storage) {
+    if (name == nullptr || g_profileId[0] == 0) return false;
+    const bool local = _wcsnicmp(name, L"\\\\.\\pipe\\", 9) == 0 || _wcsnicmp(name, L"\\\\?\\pipe\\", 9) == 0;
+    if (!local) return false;
+    const wchar_t* endpoint = name + 9;
+    if (_wcsicmp(endpoint, L"PipeZCallRecv") != 0 && _wcsicmp(endpoint, L"PipeZCallSend") != 0) return false;
+    storage.assign(name);
+    storage.append(L".due.");
+    storage.append(g_profileId);
+    return true;
+}
+
+bool CallPipeName(LPCSTR name, std::string& storage) {
+    if (name == nullptr || g_profileId[0] == 0) return false;
+    if (_strnicmp(name, "\\\\.\\pipe\\", 9) != 0 && _strnicmp(name, "\\\\?\\pipe\\", 9) != 0) return false;
+    const char* endpoint = name + 9;
+    if (_stricmp(endpoint, "PipeZCallRecv") != 0 && _stricmp(endpoint, "PipeZCallSend") != 0) return false;
+    storage.assign(name);
+    storage.append(".due.");
+    for (const wchar_t* id = g_profileId; *id != 0; ++id) storage.push_back(static_cast<char>(*id));
+    return true;
+}
+
 HANDLE WINAPI MineCreateFileW(LPCWSTR name, DWORD access, DWORD share, LPSECURITY_ATTRIBUTES security,
                               DWORD disposition, DWORD flags, HANDLE templateFile) {
-    if (g_inLog || name == nullptr) {
-        return TrueCreateFileW(name, access, share, security, disposition, flags, templateFile);
+    if (!g_inLog && name != nullptr) {
+        std::wstring pipe;
+        if (CallPipeName(name, pipe)) return TrueCreateFileW(pipe.c_str(), access, share, security, disposition, flags, templateFile);
+        std::wstring rewritten;
+        if (RewriteDataPath(name, rewritten)) {
+            if (g_debug) Logf(L"file %s", rewritten.c_str());
+            return TrueCreateFileW(rewritten.c_str(), access, share, security, disposition, flags, templateFile);
+        }
     }
-    std::wstring rewritten;
-    if (!RewriteDataPath(name, rewritten)) {
-        return TrueCreateFileW(name, access, share, security, disposition, flags, templateFile);
-    }
-    if (g_debug) {
-        Logf(L"file %s", rewritten.c_str());
-    }
-    return TrueCreateFileW(rewritten.c_str(), access, share, security, disposition, flags, templateFile);
+    return TrueCreateFileW(name, access, share, security, disposition, flags, templateFile);
 }
+
+HANDLE WINAPI MineCreateFileA(LPCSTR name, DWORD access, DWORD share, LPSECURITY_ATTRIBUTES security,
+                              DWORD disposition, DWORD flags, HANDLE templateFile) {
+    std::string pipe;
+    return CallPipeName(name, pipe) ? TrueCreateFileA(pipe.c_str(), access, share, security, disposition, flags, templateFile)
+                                    : TrueCreateFileA(name, access, share, security, disposition, flags, templateFile);
+}
+
+HANDLE WINAPI MineCreateNamedPipeW(LPCWSTR name, DWORD openMode, DWORD pipeMode, DWORD instances,
+                                   DWORD outBuffer, DWORD inBuffer, DWORD timeout, LPSECURITY_ATTRIBUTES security) {
+    std::wstring pipe;
+    return CallPipeName(name, pipe) ? TrueCreateNamedPipeW(pipe.c_str(), openMode, pipeMode, instances, outBuffer, inBuffer, timeout, security)
+                                    : TrueCreateNamedPipeW(name, openMode, pipeMode, instances, outBuffer, inBuffer, timeout, security);
+}
+
+HANDLE WINAPI MineCreateNamedPipeA(LPCSTR name, DWORD openMode, DWORD pipeMode, DWORD instances,
+                                   DWORD outBuffer, DWORD inBuffer, DWORD timeout, LPSECURITY_ATTRIBUTES security) {
+    std::string pipe;
+    return CallPipeName(name, pipe) ? TrueCreateNamedPipeA(pipe.c_str(), openMode, pipeMode, instances, outBuffer, inBuffer, timeout, security)
+                                    : TrueCreateNamedPipeA(name, openMode, pipeMode, instances, outBuffer, inBuffer, timeout, security);
+}
+
+BOOL WINAPI MineWaitNamedPipeW(LPCWSTR name, DWORD timeout) {
+    std::wstring pipe;
+    return CallPipeName(name, pipe) ? TrueWaitNamedPipeW(pipe.c_str(), timeout) : TrueWaitNamedPipeW(name, timeout);
+}
+
 
 BOOL WINAPI MineCreateProcessW(LPCWSTR application, LPWSTR command, LPSECURITY_ATTRIBUTES processAttributes,
                                LPSECURITY_ATTRIBUTES threadAttributes, BOOL inherit, DWORD flags, LPVOID environment,
@@ -678,6 +735,10 @@ void InstallHooks() {
         TrueCreateMutexExW = reinterpret_cast<CreateMutexExW_t>(GetProcAddress(kernelbase, "CreateMutexExW"));
         TrueOpenMutexW = reinterpret_cast<OpenMutexW_t>(GetProcAddress(kernelbase, "OpenMutexW"));
         TrueCreateFileW = reinterpret_cast<CreateFileW_t>(GetProcAddress(kernelbase, "CreateFileW"));
+        TrueCreateFileA = reinterpret_cast<CreateFileA_t>(GetProcAddress(kernelbase, "CreateFileA"));
+        TrueCreateNamedPipeW = reinterpret_cast<CreateNamedPipeW_t>(GetProcAddress(kernelbase, "CreateNamedPipeW"));
+        TrueCreateNamedPipeA = reinterpret_cast<CreateNamedPipeA_t>(GetProcAddress(kernelbase, "CreateNamedPipeA"));
+        TrueWaitNamedPipeW = reinterpret_cast<WaitNamedPipeW_t>(GetProcAddress(kernelbase, "WaitNamedPipeW"));
         TrueCreateProcessW = reinterpret_cast<CreateProcessW_t>(GetProcAddress(kernelbase, "CreateProcessW"));
     }
     if (TrueCreateMutexW == nullptr) {
@@ -689,9 +750,11 @@ void InstallHooks() {
     if (TrueOpenMutexW == nullptr) {
         TrueOpenMutexW = OpenMutexW;
     }
-    if (TrueCreateFileW == nullptr) {
-        TrueCreateFileW = CreateFileW;
-    }
+    if (TrueCreateFileW == nullptr) TrueCreateFileW = CreateFileW;
+    if (TrueCreateFileA == nullptr) TrueCreateFileA = CreateFileA;
+    if (TrueCreateNamedPipeW == nullptr) TrueCreateNamedPipeW = CreateNamedPipeW;
+    if (TrueCreateNamedPipeA == nullptr) TrueCreateNamedPipeA = CreateNamedPipeA;
+    if (TrueWaitNamedPipeW == nullptr) TrueWaitNamedPipeW = WaitNamedPipeW;
     if (TrueCreateProcessW == nullptr) {
         TrueCreateProcessW = CreateProcessW;
     }
@@ -716,6 +779,10 @@ void InstallHooks() {
     DetourAttach(&(PVOID&)TrueCreateMutexExW, MineCreateMutexExW);
     DetourAttach(&(PVOID&)TrueOpenMutexW, MineOpenMutexW);
     DetourAttach(&(PVOID&)TrueCreateFileW, MineCreateFileW);
+    DetourAttach(&(PVOID&)TrueCreateFileA, MineCreateFileA);
+    DetourAttach(&(PVOID&)TrueCreateNamedPipeW, MineCreateNamedPipeW);
+    DetourAttach(&(PVOID&)TrueCreateNamedPipeA, MineCreateNamedPipeA);
+    DetourAttach(&(PVOID&)TrueWaitNamedPipeW, MineWaitNamedPipeW);
     if (g_dllPath[0] != 0) {
         DetourAttach(&(PVOID&)TrueCreateProcessW, MineCreateProcessW);
     }
