@@ -11,6 +11,7 @@
 
 namespace {
 
+// nguyenphi37
 std::wstring Known(REFKNOWNFOLDERID id) {
     PWSTR path = nullptr;
     if (FAILED(SHGetKnownFolderPath(id, 0, nullptr, &path)) || path == nullptr) {
@@ -21,6 +22,7 @@ std::wstring Known(REFKNOWNFOLDERID id) {
     return value;
 }
 
+// nguyenphi37
 std::wstring FolderPath(int csidl) {
     wchar_t path[MAX_PATH];
     if (FAILED(SHGetFolderPathW(nullptr, csidl, nullptr, SHGFP_TYPE_CURRENT, path))) {
@@ -29,6 +31,7 @@ std::wstring FolderPath(int csidl) {
     return path;
 }
 
+// nguyenphi37
 std::wstring Env(const wchar_t* name) {
     wchar_t buffer[MAX_PATH];
     DWORD n = GetEnvironmentVariableW(name, buffer, MAX_PATH);
@@ -38,6 +41,7 @@ std::wstring Env(const wchar_t* name) {
     return buffer;
 }
 
+// nguyenphi37
 void WriteProbe(const std::wstring& path, const std::wstring& text) {
     HANDLE file = CreateFileW(path.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (file == INVALID_HANDLE_VALUE) {
@@ -55,6 +59,7 @@ void WriteProbe(const std::wstring& path, const std::wstring& text) {
 
 }  // namespace
 
+// nguyenphi37
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
     bool checkMutex = false;
     DWORD holdMs = 1500;

@@ -5,6 +5,7 @@
 
 #include <windows.h>
 
+// nguyenphi37
 inline bool InjectDll(HANDLE process, const wchar_t* dllPath) {
     if (process == nullptr || dllPath == nullptr || dllPath[0] == 0) {
         return false;

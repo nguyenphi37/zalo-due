@@ -76,6 +76,7 @@ ShellNotify_t TrueShell_NotifyIconW = nullptr;
 ShellNotify_t TrueShell_NotifyIconA = nullptr;
 bool g_loggedTray = false;
 
+// nguyenphi37
 void Log(const wchar_t* message) {
     if (!g_logReady || g_logPath[0] == 0 || g_inLog) {
         return;
@@ -100,6 +101,7 @@ void Log(const wchar_t* message) {
     g_inLog = false;
 }
 
+// nguyenphi37
 void Logf(const wchar_t* fmt, ...) {
     wchar_t buffer[1024];
     va_list args;
@@ -109,6 +111,7 @@ void Logf(const wchar_t* fmt, ...) {
     Log(buffer);
 }
 
+// nguyenphi37
 bool CopyEnv(const wchar_t* name, wchar_t* dest, size_t destCount, bool required) {
     DWORD n = GetEnvironmentVariableW(name, dest, static_cast<DWORD>(destCount));
     if (n == 0 || n >= destCount) {
@@ -121,6 +124,7 @@ bool CopyEnv(const wchar_t* name, wchar_t* dest, size_t destCount, bool required
     return true;
 }
 
+// nguyenphi37
 bool AllowedProfileRoot(const wchar_t* root) {
     std::wstring lower(root);
     for (wchar_t& ch : lower) {
@@ -132,6 +136,7 @@ bool AllowedProfileRoot(const wchar_t* root) {
            lower.find(L"\\due\\selftest\\") != std::wstring::npos;
 }
 
+// nguyenphi37
 bool InDueProfile(const wchar_t* path) {
     if (path == nullptr) {
         return false;
@@ -142,6 +147,7 @@ bool InDueProfile(const wchar_t* path) {
            FindStringOrdinal(FIND_FROMSTART, path, -1, L"\\Due\\selftest\\", -1, TRUE) != -1;
 }
 
+// nguyenphi37
 bool MarkerAt(const std::wstring& hay, size_t pos, const wchar_t* marker) {
     size_t n = wcslen(marker);
     if (pos + n > hay.size()) {
@@ -157,6 +163,7 @@ bool MarkerAt(const std::wstring& hay, size_t pos, const wchar_t* marker) {
     return next == L'\\' || next == L'/';
 }
 
+// nguyenphi37
 bool RewriteDataPath(const std::wstring& in, std::wstring& out) {
     if (in.empty() || InDueProfile(in.c_str())) {
         return false;
@@ -180,6 +187,7 @@ bool RewriteDataPath(const std::wstring& in, std::wstring& out) {
     return false;
 }
 
+// nguyenphi37
 bool ShouldSuffixMutex(LPCWSTR name) {
     if (name == nullptr || name[0] == 0 || g_profileId[0] == 0) {
         return false;
@@ -187,6 +195,7 @@ bool ShouldSuffixMutex(LPCWSTR name) {
     return FindStringOrdinal(FIND_FROMSTART, name, -1, L"singleton", -1, TRUE) != -1;
 }
 
+// nguyenphi37
 const wchar_t* Suffixed(LPCWSTR name, std::wstring& storage) {
     if (!ShouldSuffixMutex(name)) {
         return name;
@@ -200,6 +209,7 @@ const wchar_t* Suffixed(LPCWSTR name, std::wstring& storage) {
     return storage.c_str();
 }
 
+// nguyenphi37
 bool EndsWithExe(LPCWSTR value) {
     if (value == nullptr) {
         return false;
@@ -208,6 +218,7 @@ bool EndsWithExe(LPCWSTR value) {
     return length >= 8 && _wcsicmp(value + length - 8, L"Zalo.exe") == 0;
 }
 
+// nguyenphi37
 bool HasText(LPCWSTR value, const wchar_t* needle) {
     if (value == nullptr || needle == nullptr || needle[0] == 0) {
         return false;
@@ -215,6 +226,7 @@ bool HasText(LPCWSTR value, const wchar_t* needle) {
     return FindStringOrdinal(FIND_FROMSTART, value, -1, needle, -1, TRUE) != -1;
 }
 
+// nguyenphi37
 bool IsZaloSelfUpdate(LPCWSTR application, LPCWSTR command) {
     const wchar_t* needles[] = {
         L"ZaloSetup", L"\\update.exe", L"Uninstall Zalo", L"\\zalo-updater\\", L"--relaunch-silently",
@@ -228,6 +240,7 @@ bool IsZaloSelfUpdate(LPCWSTR application, LPCWSTR command) {
     return false;
 }
 
+// nguyenphi37
 bool LooksLikeZaloImage(LPCWSTR application, LPCWSTR command) {
     if (EndsWithExe(application)) {
         return true;
@@ -248,6 +261,7 @@ bool LooksLikeZaloImage(LPCWSTR application, LPCWSTR command) {
     return false;
 }
 
+// nguyenphi37
 const wchar_t* RedirectKnown(REFKNOWNFOLDERID id) {
     if (IsEqualGUID(id, FOLDERID_RoamingAppData)) {
         return g_appData;
@@ -267,6 +281,7 @@ const wchar_t* RedirectKnown(REFKNOWNFOLDERID id) {
     return nullptr;
 }
 
+// nguyenphi37
 HRESULT ReturnAlloc(const wchar_t* path, PWSTR* out) {
     size_t chars = wcslen(path) + 1;
     PWSTR buffer = static_cast<PWSTR>(CoTaskMemAlloc(chars * sizeof(wchar_t)));
@@ -278,6 +293,7 @@ HRESULT ReturnAlloc(const wchar_t* path, PWSTR* out) {
     return S_OK;
 }
 
+// nguyenphi37
 HRESULT WINAPI MineSHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD flags, HANDLE token, PWSTR* path) {
     const wchar_t* redirected = RedirectKnown(rfid);
     if (redirected != nullptr && redirected[0] != 0) {
@@ -288,6 +304,7 @@ HRESULT WINAPI MineSHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD flags, HAND
     return TrueSHGetKnownFolderPath(rfid, flags, token, path);
 }
 
+// nguyenphi37
 HRESULT WINAPI MineSHGetFolderPathW(HWND hwnd, int csidl, HANDLE token, DWORD flags, LPWSTR path) {
     int id = csidl & 0x00FF;
     const wchar_t* redirected = nullptr;
@@ -309,21 +326,25 @@ HRESULT WINAPI MineSHGetFolderPathW(HWND hwnd, int csidl, HANDLE token, DWORD fl
     return S_OK;
 }
 
+// nguyenphi37
 HANDLE WINAPI MineCreateMutexW(LPSECURITY_ATTRIBUTES security, BOOL owner, LPCWSTR name) {
     std::wstring storage;
     return TrueCreateMutexW(security, owner, Suffixed(name, storage));
 }
 
+// nguyenphi37
 HANDLE WINAPI MineCreateMutexExW(LPSECURITY_ATTRIBUTES security, LPCWSTR name, DWORD flags, DWORD access) {
     std::wstring storage;
     return TrueCreateMutexExW(security, Suffixed(name, storage), flags, access);
 }
 
+// nguyenphi37
 HANDLE WINAPI MineOpenMutexW(DWORD access, BOOL inherit, LPCWSTR name) {
     std::wstring storage;
     return TrueOpenMutexW(access, inherit, Suffixed(name, storage));
 }
 
+// nguyenphi37
 bool CallPipeName(LPCWSTR name, std::wstring& storage) {
     if (name == nullptr || g_profileId[0] == 0) return false;
     const bool local = _wcsnicmp(name, L"\\\\.\\pipe\\", 9) == 0 || _wcsnicmp(name, L"\\\\?\\pipe\\", 9) == 0;
@@ -336,6 +357,7 @@ bool CallPipeName(LPCWSTR name, std::wstring& storage) {
     return true;
 }
 
+// nguyenphi37
 bool CallPipeName(LPCSTR name, std::string& storage) {
     if (name == nullptr || g_profileId[0] == 0) return false;
     if (_strnicmp(name, "\\\\.\\pipe\\", 9) != 0 && _strnicmp(name, "\\\\?\\pipe\\", 9) != 0) return false;
@@ -347,6 +369,7 @@ bool CallPipeName(LPCSTR name, std::string& storage) {
     return true;
 }
 
+// nguyenphi37
 HANDLE WINAPI MineCreateFileW(LPCWSTR name, DWORD access, DWORD share, LPSECURITY_ATTRIBUTES security,
                               DWORD disposition, DWORD flags, HANDLE templateFile) {
     if (!g_inLog && name != nullptr) {
@@ -361,6 +384,7 @@ HANDLE WINAPI MineCreateFileW(LPCWSTR name, DWORD access, DWORD share, LPSECURIT
     return TrueCreateFileW(name, access, share, security, disposition, flags, templateFile);
 }
 
+// nguyenphi37
 HANDLE WINAPI MineCreateFileA(LPCSTR name, DWORD access, DWORD share, LPSECURITY_ATTRIBUTES security,
                               DWORD disposition, DWORD flags, HANDLE templateFile) {
     std::string pipe;
@@ -368,6 +392,7 @@ HANDLE WINAPI MineCreateFileA(LPCSTR name, DWORD access, DWORD share, LPSECURITY
                                     : TrueCreateFileA(name, access, share, security, disposition, flags, templateFile);
 }
 
+// nguyenphi37
 HANDLE WINAPI MineCreateNamedPipeW(LPCWSTR name, DWORD openMode, DWORD pipeMode, DWORD instances,
                                    DWORD outBuffer, DWORD inBuffer, DWORD timeout, LPSECURITY_ATTRIBUTES security) {
     std::wstring pipe;
@@ -375,6 +400,7 @@ HANDLE WINAPI MineCreateNamedPipeW(LPCWSTR name, DWORD openMode, DWORD pipeMode,
                                     : TrueCreateNamedPipeW(name, openMode, pipeMode, instances, outBuffer, inBuffer, timeout, security);
 }
 
+// nguyenphi37
 HANDLE WINAPI MineCreateNamedPipeA(LPCSTR name, DWORD openMode, DWORD pipeMode, DWORD instances,
                                    DWORD outBuffer, DWORD inBuffer, DWORD timeout, LPSECURITY_ATTRIBUTES security) {
     std::string pipe;
@@ -382,12 +408,14 @@ HANDLE WINAPI MineCreateNamedPipeA(LPCSTR name, DWORD openMode, DWORD pipeMode, 
                                     : TrueCreateNamedPipeA(name, openMode, pipeMode, instances, outBuffer, inBuffer, timeout, security);
 }
 
+// nguyenphi37
 BOOL WINAPI MineWaitNamedPipeW(LPCWSTR name, DWORD timeout) {
     std::wstring pipe;
     return CallPipeName(name, pipe) ? TrueWaitNamedPipeW(pipe.c_str(), timeout) : TrueWaitNamedPipeW(name, timeout);
 }
 
 
+// nguyenphi37
 BOOL WINAPI MineCreateProcessW(LPCWSTR application, LPWSTR command, LPSECURITY_ATTRIBUTES processAttributes,
                                LPSECURITY_ATTRIBUTES threadAttributes, BOOL inherit, DWORD flags, LPVOID environment,
                                LPCWSTR directory, LPSTARTUPINFOW startup, LPPROCESS_INFORMATION information) {
@@ -431,6 +459,7 @@ BOOL WINAPI MineCreateProcessW(LPCWSTR application, LPWSTR command, LPSECURITY_A
     return TRUE;
 }
 
+// nguyenphi37
 BOOL WINAPI MineShell_NotifyIconW(DWORD, void*) {
     if (!g_loggedTray) {
         g_loggedTray = true;
@@ -439,15 +468,18 @@ BOOL WINAPI MineShell_NotifyIconW(DWORD, void*) {
     return TRUE;
 }
 
+// nguyenphi37
 BOOL WINAPI MineShell_NotifyIconA(DWORD, void*) {
     return MineShell_NotifyIconW(0, nullptr);
 }
 
+// nguyenphi37
 void FailClosed(const wchar_t* reason) {
     Log(reason);
     TerminateProcess(GetCurrentProcess(), 4);
 }
 
+// nguyenphi37
 HRESULT WINAPI MineSetAppUserModelID(PCWSTR) {
     if (TrueSetAppUserModelID == nullptr || g_appId[0] == 0) {
         return S_OK;
@@ -455,6 +487,7 @@ HRESULT WINAPI MineSetAppUserModelID(PCWSTR) {
     return TrueSetAppUserModelID(g_appId);
 }
 
+// nguyenphi37
 void StampWindow(HWND hwnd) {
     IPropertyStore* store = nullptr;
     if (SUCCEEDED(SHGetPropertyStoreForWindow(hwnd, IID_PPV_ARGS(&store))) && store != nullptr) {
@@ -503,6 +536,7 @@ HHOOK g_callHook = nullptr;
 DWORD g_hookedThreads[8]{};
 int g_hookedCount = 0;
 
+// nguyenphi37
 bool IsBlankHelperTitle(const wchar_t* title) {
     if (title == nullptr || title[0] == 0) {
         return false;
@@ -512,6 +546,7 @@ bool IsBlankHelperTitle(const wchar_t* title) {
            wcsstr(title, L"Dedicated Worker") != nullptr;
 }
 
+// nguyenphi37
 bool IsBlankHelperWindow(HWND hwnd) {
     wchar_t title[512];
     if (GetWindowTextW(hwnd, title, 512) <= 0) {
@@ -523,6 +558,7 @@ bool IsBlankHelperWindow(HWND hwnd) {
 using ShowWindow_t = BOOL(WINAPI*)(HWND, int);
 ShowWindow_t TrueShowWindow = nullptr;
 
+// nguyenphi37
 BOOL WINAPI MineShowWindow(HWND hwnd, int cmd) {
     if (cmd != SW_HIDE && IsBlankHelperWindow(hwnd)) {
         return TrueShowWindow(hwnd, SW_HIDE);
@@ -530,6 +566,7 @@ BOOL WINAPI MineShowWindow(HWND hwnd, int cmd) {
     return TrueShowWindow(hwnd, cmd);
 }
 
+// nguyenphi37
 bool IsAccountWindow(HWND hwnd) {
     wchar_t title[512];
     if (GetWindowTextW(hwnd, title, 512) <= 0) {
@@ -541,6 +578,7 @@ bool IsAccountWindow(HWND hwnd) {
     return wcsstr(title, L" - Zalo") != nullptr;
 }
 
+// nguyenphi37
 bool InCloseButton(HWND root, POINT pt) {
     RECT rect{};
     if (!GetWindowRect(root, &rect)) {
@@ -559,6 +597,7 @@ bool InCloseButton(HWND root, POINT pt) {
     return pt.x >= rect.right - width && pt.x < rect.right && pt.y >= rect.top && pt.y < rect.top + height;
 }
 
+// nguyenphi37
 LRESULT CALLBACK MouseHook(int code, WPARAM wp, LPARAM lp) {
     if (code == HC_ACTION && (wp == WM_LBUTTONUP || wp == WM_NCLBUTTONUP)) {
         auto* info = reinterpret_cast<MOUSEHOOKSTRUCT*>(lp);
@@ -570,11 +609,13 @@ LRESULT CALLBACK MouseHook(int code, WPARAM wp, LPARAM lp) {
     return CallNextHookEx(nullptr, code, wp, lp);
 }
 
+// nguyenphi37
 UINT DueCloseMessage() {
     static UINT message = RegisterWindowMessageW(L"Due.HookClose");
     return message;
 }
 
+// nguyenphi37
 LRESULT CALLBACK MineCloseProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     auto original = reinterpret_cast<WNDPROC>(GetPropW(hwnd, kCloseProp));
     if (original == nullptr) {
@@ -596,6 +637,7 @@ LRESULT CALLBACK MineCloseProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     return result;
 }
 
+// nguyenphi37
 LRESULT CALLBACK CallHook(int code, WPARAM wp, LPARAM lp) {
     if (code == HC_ACTION) {
         auto* msg = reinterpret_cast<CWPSTRUCT*>(lp);
@@ -610,6 +652,7 @@ LRESULT CALLBACK CallHook(int code, WPARAM wp, LPARAM lp) {
     return CallNextHookEx(g_callHook, code, wp, lp);
 }
 
+// nguyenphi37
 void WatchClose(HWND hwnd) {
     auto current = reinterpret_cast<WNDPROC>(GetWindowLongPtrW(hwnd, GWLP_WNDPROC));
     if (current == MineCloseProc) {
@@ -635,6 +678,7 @@ void WatchClose(HWND hwnd) {
     SendMessageW(hwnd, DueCloseMessage(), 0, 0);
 }
 
+// nguyenphi37
 BOOL CALLBACK BrandWindow(HWND hwnd, LPARAM) {
     DWORD pid = 0;
     GetWindowThreadProcessId(hwnd, &pid);
@@ -661,6 +705,7 @@ BOOL CALLBACK BrandWindow(HWND hwnd, LPARAM) {
     return TRUE;
 }
 
+// nguyenphi37
 DWORD WINAPI TaskbarThread(LPVOID) {
     Sleep(700);
     CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
@@ -670,6 +715,7 @@ DWORD WINAPI TaskbarThread(LPVOID) {
     }
 }
 
+// nguyenphi37
 void StartTaskbarIdentity() {
     if (!CopyEnv(L"DUE_ACCOUNT_NAME", g_accountName, _countof(g_accountName), false) || g_accountName[0] == 0) {
         return;
@@ -698,6 +744,7 @@ void StartTaskbarIdentity() {
     }
 }
 
+// nguyenphi37
 void InstallHooks() {
     wchar_t debug[8];
     if (CopyEnv(L"DUE_DEBUG", debug, 8, false) && debug[0] == L'1') {
@@ -805,6 +852,7 @@ void InstallHooks() {
 
 }  // namespace
 
+// nguyenphi37
 BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved) {
     (void)reserved;
     if (DetourIsHelperProcess()) {

@@ -25,12 +25,14 @@ from pathlib import Path
 SOURCE_ROOT = Path(__file__).resolve().parents[1]
 
 
+# nguyenphi37
 def app_dir() -> Path:
     if getattr(sys, "frozen", False):
         return Path(sys.executable).resolve().parent
     return SOURCE_ROOT
 
 
+# nguyenphi37
 def bundle_root() -> Path:
     if getattr(sys, "frozen", False):
         return Path(getattr(sys, "_MEIPASS"))
@@ -102,6 +104,7 @@ kernel32.GetVolumeInformationW.argtypes = [
 kernel32.GetVolumeInformationW.restype = wintypes.BOOL
 
 
+# nguyenphi37
 class PROCESS_MEMORY_COUNTERS_EX2(ctypes.Structure):
     _fields_ = [
         ("cb", wintypes.DWORD),
@@ -221,6 +224,7 @@ version.VerQueryValueW.argtypes = [
 version.VerQueryValueW.restype = wintypes.BOOL
 
 
+# nguyenphi37
 class PROCESSENTRY32W(ctypes.Structure):
     _fields_ = [
         ("dwSize", wintypes.DWORD),
@@ -242,15 +246,19 @@ kernel32.Process32NextW.argtypes = [wintypes.HANDLE, ctypes.POINTER(PROCESSENTRY
 kernel32.Process32NextW.restype = wintypes.BOOL
 
 
+# nguyenphi37
 class DueError(Exception):
     pass
 
 
+# nguyenphi37
 class _SetupUrl(Exception):
+    # nguyenphi37
     def __init__(self, url: str) -> None:
         self.url = url
 
 
+# nguyenphi37
 def is_reparse(path: Path) -> bool:
     attrs = kernel32.GetFileAttributesW(str(path))
     if attrs == INVALID_FILE_ATTRIBUTES:
@@ -258,6 +266,7 @@ def is_reparse(path: Path) -> bool:
     return bool(attrs & FILE_ATTRIBUTE_REPARSE_POINT)
 
 
+# nguyenphi37
 def volume_caption(drive: str) -> str:
     letter = (drive or "C:").rstrip("\\")
     if len(letter) == 1:
@@ -269,6 +278,7 @@ def volume_caption(drive: str) -> str:
     return f"{label} ({letter})"
 
 
+# nguyenphi37
 def _storage_kind(relative: Path) -> str:
     parts = [part.casefold() for part in relative.parts]
     if not parts:
@@ -284,6 +294,7 @@ def _storage_kind(relative: Path) -> str:
     return "other"
 
 
+# nguyenphi37
 def measure_profile(profile: Path) -> dict:
     totals = {"media": 0, "cache": 0, "system": 0, "other": 0}
     if not profile.exists() or is_reparse(profile):
@@ -311,6 +322,7 @@ def measure_profile(profile: Path) -> dict:
     return totals
 
 
+# nguyenphi37
 def working_set(pid: int) -> int:
     """Private RAM, the same figure as Task Manager's Memory column."""
     handle = kernel32.OpenProcess(0x1010, False, pid)
@@ -326,6 +338,7 @@ def working_set(pid: int) -> int:
         kernel32.CloseHandle(handle)
 
 
+# nguyenphi37
 def _deletable(path: Path) -> bool:
     absolute = os.path.normcase(os.path.abspath(str(path)))
     local = os.path.normcase(os.path.abspath(os.environ["LOCALAPPDATA"]))
@@ -340,6 +353,7 @@ def _deletable(path: Path) -> bool:
     return any(absolute == root or absolute.startswith(root + os.sep) for root in roots)
 
 
+# nguyenphi37
 def safe_rmtree(path: Path) -> None:
     path = Path(path)
     if not _deletable(path):
@@ -381,6 +395,7 @@ def safe_rmtree(path: Path) -> None:
     os.rmdir(path)
 
 
+# nguyenphi37
 def clean_name(name: str) -> str:
     text = " ".join((name or "").split())
     if not text:
@@ -390,6 +405,7 @@ def clean_name(name: str) -> str:
     return text
 
 
+# nguyenphi37
 class GUID(ctypes.Structure):
     _fields_ = [
         ("Data1", ctypes.c_ulong),
@@ -399,6 +415,7 @@ class GUID(ctypes.Structure):
     ]
 
 
+# nguyenphi37
 def _guid(text: str) -> GUID:
     parts = text.split("-")
     return GUID(
@@ -409,6 +426,7 @@ def _guid(text: str) -> GUID:
     )
 
 
+# nguyenphi37
 def _gdiplus():
     library = ctypes.WinDLL("gdiplus")
     library.GdiplusStartup.argtypes = [ctypes.POINTER(ctypes.c_ulong), ctypes.c_void_p, ctypes.c_void_p]
@@ -477,11 +495,13 @@ def _gdiplus():
     return library, token
 
 
+# nguyenphi37
 def _wrap_png_icon(png: bytes, dest: Path) -> None:
     entry = struct.pack("<BBBBHHII", 32, 32, 0, 0, 1, 32, len(png), 22)
     dest.write_bytes(struct.pack("<HHH", 0, 1, 1) + entry + png)
 
 
+# nguyenphi37
 def _draw_badge(library, letter: str, color: int):
     image = ctypes.c_void_p()
     graphics = ctypes.c_void_p()
@@ -519,6 +539,7 @@ def _draw_badge(library, letter: str, color: int):
     return image
 
 
+# nguyenphi37
 def _draw_photo(library, source: Path):
     photo = ctypes.c_void_p()
     if library.GdipCreateBitmapFromFile(str(source), ctypes.byref(photo)) != 0 or not photo:
@@ -549,6 +570,7 @@ def _draw_photo(library, source: Path):
     return image
 
 
+# nguyenphi37
 def create_toast_shortcut(path: Path, target: Path, arguments: str, icon: Path, app_id: str, description: str) -> None:
     class PropertyKey(ctypes.Structure):
         _fields_ = [("fmtid", GUID), ("pid", wintypes.DWORD)]
@@ -617,11 +639,13 @@ def create_toast_shortcut(path: Path, target: Path, arguments: str, icon: Path, 
 _icon_lock = threading.Lock()
 
 
+# nguyenphi37
 def write_taskbar_icon(dest: Path, name: str, photo: Path | None, salt: str) -> None:
     with _icon_lock:
         _write_taskbar_icon(dest, name, photo, salt)
 
 
+# nguyenphi37
 def _write_taskbar_icon(dest: Path, name: str, photo: Path | None, salt: str) -> None:
     library, token = _gdiplus()
     image = ctypes.c_void_p()
@@ -651,6 +675,7 @@ def _write_taskbar_icon(dest: Path, name: str, photo: Path | None, salt: str) ->
     _wrap_png_icon(png, dest)
 
 
+# nguyenphi37
 def pe_machine(path: Path) -> int:
     with path.open("rb") as handle:
         handle.seek(0x3C)
@@ -659,6 +684,7 @@ def pe_machine(path: Path) -> int:
         return int.from_bytes(handle.read(2), "little")
 
 
+# nguyenphi37
 def version_parts(text: str | None) -> tuple[int, ...]:
     if not text:
         return ()
@@ -668,6 +694,7 @@ def version_parts(text: str | None) -> tuple[int, ...]:
     return tuple(int(part) for part in match.group(1).split("."))
 
 
+# nguyenphi37
 def file_version(path: Path) -> str | None:
     size = version.GetFileVersionInfoSizeW(str(path), None)
     if not size:
@@ -705,6 +732,7 @@ def file_version(path: Path) -> str | None:
     return f"{major}.{minor}.{patch}.{build}"
 
 
+# nguyenphi37
 def iter_processes():
     snapshot = kernel32.CreateToolhelp32Snapshot(0x2, 0)
     if snapshot is None or snapshot == ctypes.c_void_p(-1).value:
@@ -720,6 +748,7 @@ def iter_processes():
         kernel32.CloseHandle(snapshot)
 
 
+# nguyenphi37
 def image_path(pid: int) -> str | None:
     handle = kernel32.OpenProcess(0x1000, False, pid)
     if not handle:
@@ -734,6 +763,7 @@ def image_path(pid: int) -> str | None:
         kernel32.CloseHandle(handle)
 
 
+# nguyenphi37
 def pid_alive(pid: int) -> bool:
     if pid <= 0:
         return False
@@ -749,6 +779,7 @@ def pid_alive(pid: int) -> bool:
         kernel32.CloseHandle(handle)
 
 
+# nguyenphi37
 def descendant_pids(root: int) -> set[int]:
     children: dict[int, list[int]] = {}
     for pid, parent, _name in iter_processes():
@@ -764,6 +795,7 @@ def descendant_pids(root: int) -> set[int]:
     return found
 
 
+# nguyenphi37
 def _force_foreground(hwnd) -> None:
     if user32.IsIconic(hwnd):
         user32.ShowWindow(hwnd, 9)
@@ -775,18 +807,21 @@ def _force_foreground(hwnd) -> None:
     user32.SetForegroundWindow(hwnd)
 
 
+# nguyenphi37
 def _window_title(hwnd) -> str:
     buffer = ctypes.create_unicode_buffer(512)
     user32.GetWindowTextW(hwnd, buffer, 512)
     return buffer.value
 
 
+# nguyenphi37
 def _window_class(hwnd) -> str:
     buffer = ctypes.create_unicode_buffer(128)
     user32.GetClassNameW(hwnd, buffer, 128)
     return buffer.value
 
 
+# nguyenphi37
 def _background_title(title: str) -> bool:
     text = title.casefold()
     return any(
@@ -795,6 +830,7 @@ def _background_title(title: str) -> bool:
     )
 
 
+# nguyenphi37
 def hide_background_windows(pids: set[int]) -> None:
     """Shared Worker is a blank Chromium helper. Never leave it on screen."""
 
@@ -810,6 +846,7 @@ def hide_background_windows(pids: set[int]) -> None:
     user32.EnumWindows(WNDENUMPROC(visit), 0)
 
 
+# nguyenphi37
 def hide_blank_frames(pids: set[int]) -> None:
     """Hide the empty native-frame Zalo window once the real window is visible."""
     frameless = False
@@ -847,6 +884,7 @@ def hide_blank_frames(pids: set[int]) -> None:
         user32.ShowWindow(hwnd, 0)
 
 
+# nguyenphi37
 def account_hwnd(name: str) -> tuple[int, int] | None:
     """The account window, including one Zalo has hidden. Title is 'Name - Zalo'."""
     want = f"{name} - Zalo"
@@ -874,12 +912,14 @@ def account_hwnd(name: str) -> tuple[int, int] | None:
     return best
 
 
+# nguyenphi37
 def hide_account_window(name: str) -> None:
     located = account_hwnd(name)
     if located and user32.IsWindowVisible(located[0]):
         user32.ShowWindow(located[0], 0)
 
 
+# nguyenphi37
 def focus_pids(pids: set[int]) -> bool:
     """Bring forward the real account window, not Zalo's blank framed shell."""
     hide_background_windows(pids)
@@ -924,6 +964,7 @@ def focus_pids(pids: set[int]) -> bool:
     return True
 
 
+# nguyenphi37
 def focus_title(title: str) -> bool:
     found = None
 
@@ -947,6 +988,7 @@ def focus_title(title: str) -> bool:
     return True
 
 
+# nguyenphi37
 def startup_command() -> str:
     if getattr(sys, "frozen", False):
         target = Path(sys.executable).resolve()
@@ -958,6 +1000,7 @@ def startup_command() -> str:
     return f'"{Path(sys.executable).resolve()}" "{script}" --tray'
 
 
+# nguyenphi37
 def apply_windows_startup(enabled: bool) -> None:
     key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
     with winreg.CreateKey(winreg.HKEY_CURRENT_USER, key_path) as key:
@@ -970,6 +1013,7 @@ def apply_windows_startup(enabled: bool) -> None:
         winreg.SetValueEx(key, "Zalo Due", 0, winreg.REG_SZ, startup_command())
 
 
+# nguyenphi37
 def run_hidden(args: list[str], **kwargs):
     startup = kwargs.get("startupinfo") or subprocess.STARTUPINFO()
     startup.dwFlags |= subprocess.STARTF_FORCEOFFFEEDBACK
@@ -978,6 +1022,7 @@ def run_hidden(args: list[str], **kwargs):
     return subprocess.run(args, **kwargs)
 
 
+# nguyenphi37
 def terminate_pids(pids: set[int]) -> None:
     handles = []
     for pid in pids:
@@ -992,6 +1037,7 @@ def terminate_pids(pids: set[int]) -> None:
         kernel32.CloseHandle(handle)
 
 
+# nguyenphi37
 def taskkill(pid: int, *, tree: bool = True) -> None:
     command = ["taskkill", "/PID", str(pid), "/F"]
     if tree:
@@ -1005,6 +1051,7 @@ def taskkill(pid: int, *, tree: bool = True) -> None:
     )
 
 
+# nguyenphi37
 class _PowerThrottle(ctypes.Structure):
     _fields_ = [
         ("Version", wintypes.DWORD),
@@ -1013,6 +1060,7 @@ class _PowerThrottle(ctypes.Structure):
     ]
 
 
+# nguyenphi37
 def foreground_pid() -> int | None:
     hwnd = user32.GetForegroundWindow()
     if not hwnd:
@@ -1022,6 +1070,7 @@ def foreground_pid() -> int | None:
     return proc.value or None
 
 
+# nguyenphi37
 def set_efficiency(pid: int, enabled: bool) -> None:
     access = PROCESS_SET_INFORMATION | PROCESS_SET_QUOTA | PROCESS_QUERY_INFORMATION
     handle = kernel32.OpenProcess(access, False, pid)
@@ -1041,6 +1090,7 @@ def set_efficiency(pid: int, enabled: bool) -> None:
         kernel32.CloseHandle(handle)
 
 
+# nguyenphi37
 def is_foreign_updater(image: str, name: str) -> bool:
     lowered = f"{image} {name}".lower()
     if any(marker in lowered for marker in ("zalosetup", "\\update.exe", "uninstall zalo", "\\zalo-updater\\", "zalo-updater")):
@@ -1054,10 +1104,12 @@ def is_foreign_updater(image: str, name: str) -> bool:
         return False
 
 
+# nguyenphi37
 def _same_dir(left: Path, right: Path) -> bool:
     return os.path.normcase(os.path.abspath(left)) == os.path.normcase(os.path.abspath(right))
 
 
+# nguyenphi37
 def _junction_target(link: Path) -> Path | None:
     if not is_reparse(link):
         return None
@@ -1067,6 +1119,7 @@ def _junction_target(link: Path) -> Path | None:
         return None
 
 
+# nguyenphi37
 def _create_junction(link: Path, target: Path) -> None:
     link.mkdir(parents=True, exist_ok=False)
     absolute = os.path.normpath(os.path.abspath(target))
@@ -1089,6 +1142,7 @@ def _create_junction(link: Path, target: Path) -> None:
         raise DueError(f"Không tạo được liên kết thư mục ({error})")
 
 
+# nguyenphi37
 def link_junction(link: Path, target: Path, *, create_target: bool) -> None:
     if create_target:
         target.mkdir(parents=True, exist_ok=True)
@@ -1105,6 +1159,7 @@ def link_junction(link: Path, target: Path, *, create_target: bool) -> None:
     _create_junction(link, target)
 
 
+# nguyenphi37
 def resolve_setup_url() -> str:
     class Redirect(urllib.request.HTTPRedirectHandler):
         def redirect_request(self, req, fp, code, msg, headers, newurl):
@@ -1124,6 +1179,7 @@ def resolve_setup_url() -> str:
     raise DueError("Không lấy được link cài Zalo")
 
 
+# nguyenphi37
 def copy_tree_skip_reparse(source: Path, dest: Path) -> None:
     dest.mkdir(parents=True, exist_ok=True)
     for current, dirs, files in os.walk(source):
@@ -1136,6 +1192,7 @@ def copy_tree_skip_reparse(source: Path, dest: Path) -> None:
                 shutil.copy2(Path(current) / name, copied)
 
 
+# nguyenphi37
 def _file_count(path: Path) -> int:
     if not path.exists():
         return 0
@@ -1146,6 +1203,7 @@ def _file_count(path: Path) -> int:
     return total
 
 
+# nguyenphi37
 def _no_login_browser_profile(path: Path) -> bool:
     config = path / "config.json"
     if not config.is_file():
@@ -1154,6 +1212,7 @@ def _no_login_browser_profile(path: Path) -> bool:
     return not any(marker in text for marker in ("uid", "phone", "user_id", "userid", "login"))
 
 
+# nguyenphi37
 def _is_png(path: Path) -> bool:
     try:
         with path.open("rb") as handle:
@@ -1162,6 +1221,7 @@ def _is_png(path: Path) -> bool:
         return False
 
 
+# nguyenphi37
 def relocate_data_folder(home: Path) -> None:
     legacy = home.parent / "Due"
     if (home / "accounts.json").exists() or not (legacy / "accounts.json").exists():
@@ -1179,7 +1239,9 @@ def relocate_data_folder(home: Path) -> None:
         return
 
 
+# nguyenphi37
 class DueCore:
+    # nguyenphi37
     def __init__(self, home: Path | None = None) -> None:
         self.home = Path(home) if home else app_dir() / "data"
         relocate_data_folder(self.home)
@@ -1211,11 +1273,13 @@ class DueCore:
         self.adopt_zalo()
         self.retire_external_zalo()
 
+    # nguyenphi37
     def log(self, message: str) -> None:
         stamp = time.strftime("%Y-%m-%d %H:%M:%S")
         with (self.logs / "due.log").open("a", encoding="utf-8") as handle:
             handle.write(f"{stamp} {message}\n")
 
+    # nguyenphi37
     def _load_accounts(self) -> list[dict]:
         if not self.accounts_path.exists():
             return []
@@ -1226,12 +1290,14 @@ class DueCore:
         accounts = data.get("accounts", [])
         return [item for item in accounts if isinstance(item, dict) and item.get("id") and item.get("name")]
 
+    # nguyenphi37
     def _save_accounts(self) -> None:
         payload = json.dumps({"accounts": self.accounts}, ensure_ascii=False, indent=2)
         temp = self.accounts_path.with_suffix(".json.tmp")
         temp.write_text(payload, encoding="utf-8")
         temp.replace(self.accounts_path)
 
+    # nguyenphi37
     def _load_settings(self) -> dict:
         settings = {"autoUpdate": True, "efficiency": True, "startWithWindows": False}
         if not self.settings_path.exists():
@@ -1247,12 +1313,14 @@ class DueCore:
         settings["startWithWindows"] = bool(data.get("startWithWindows", False))
         return settings
 
+    # nguyenphi37
     def _save_settings(self) -> None:
         payload = json.dumps(self.settings, ensure_ascii=False, indent=2)
         temp = self.settings_path.with_suffix(".json.tmp")
         temp.write_text(payload, encoding="utf-8")
         temp.replace(self.settings_path)
 
+    # nguyenphi37
     def set_setting(self, key: str, enabled: bool) -> None:
         if key not in ("autoUpdate", "efficiency", "startWithWindows"):
             raise DueError("Không có mục này")
@@ -1281,6 +1349,7 @@ class DueCore:
                         account["openWithWindows"] = False
                     self._save_accounts()
 
+    # nguyenphi37
     def set_account_startup(self, account_id: str, enabled: bool) -> None:
         if not isinstance(enabled, bool):
             raise DueError("Giá trị bật tắt không hợp lệ")
@@ -1307,6 +1376,7 @@ class DueCore:
             self.log(f"startup registry: {exc}")
             raise DueError("Không ghi được khởi động cùng Windows") from exc
 
+    # nguyenphi37
     def launch_startup_accounts(self) -> None:
         if "--tray" not in sys.argv:
             return
@@ -1321,6 +1391,7 @@ class DueCore:
             daemon=True,
         ).start()
 
+    # nguyenphi37
     def _open_startup_accounts(self, ids: list[str]) -> None:
         for account_id in ids:
             try:
@@ -1328,6 +1399,7 @@ class DueCore:
             except Exception as exc:
                 self.log(f"boot account {account_id}: {exc}")
 
+    # nguyenphi37
     def tray_accounts(self) -> list[dict]:
         with self._lock:
             snapshot = [dict(item) for item in self.accounts]
@@ -1348,12 +1420,14 @@ class DueCore:
             )
         return rows
 
+    # nguyenphi37
     def _account(self, account_id: str) -> dict:
         for account in self.accounts:
             if account["id"] == account_id:
                 return account
         raise DueError("Không thấy tài khoản")
 
+    # nguyenphi37
     def profile_path(self, account_id: str, *, bucket: str = "profiles") -> Path:
         try:
             uuid.UUID(account_id)
@@ -1362,6 +1436,7 @@ class DueCore:
         root = self.profiles if bucket == "profiles" else self.selftest_root
         return root / account_id
 
+    # nguyenphi37
     def stage_binaries(self) -> None:
         for arch in ("x86", "x64"):
             destination = self.bin / arch
@@ -1378,6 +1453,7 @@ class DueCore:
                         if not target.exists():
                             raise DueError("Due chưa được biên dịch") from None
 
+    # nguyenphi37
     def tools_for(self, program: Path) -> tuple[Path, Path]:
         arch = "x86" if pe_machine(program) == 0x14C else "x64"
         folder = self.bin / arch
@@ -1387,6 +1463,7 @@ class DueCore:
             raise DueError("Thiếu thành phần để mở Zalo")
         return launch, dll
 
+    # nguyenphi37
     def _scan_zalo(self, root: Path) -> list[Path]:
         if not root.exists() or is_reparse(root):
             return []
@@ -1398,6 +1475,7 @@ class DueCore:
             found.append(direct)
         return found
 
+    # nguyenphi37
     def find_zalo(self) -> Path | None:
         found = self._scan_zalo(self.zalo_dir)
         if not found:
@@ -1418,6 +1496,7 @@ class DueCore:
 
         return max(found, key=rank)
 
+    # nguyenphi37
     def zalo_version(self) -> str | None:
         exe = self.find_zalo()
         if exe is None:
@@ -1435,12 +1514,14 @@ class DueCore:
             return None
         return raw
 
+    # nguyenphi37
     def install_root(self, exe: Path) -> Path:
         parent = exe.parent
         if parent.name.lower().startswith(("app-", "zalo-")):
             return parent.parent
         return parent
 
+    # nguyenphi37
     def ensure_layout(self, profile: Path, zalo_exe: Path | None) -> None:
         for name in ("Roaming", "Local", "LocalLow", "Documents", "Downloads"):
             (profile / name).mkdir(parents=True, exist_ok=True)
@@ -1452,6 +1533,7 @@ class DueCore:
         (profile / "Local" / "Programs").mkdir(parents=True, exist_ok=True)
         link_junction(profile / "Local" / "Programs" / "Zalo", install, create_target=False)
 
+    # nguyenphi37
     def migrate_legacy_home(self) -> None:
         old = Path(os.environ["LOCALAPPDATA"]) / "Due"
         if not old.exists() or _same_dir(old, self.home):
@@ -1475,6 +1557,7 @@ class DueCore:
         safe_rmtree(old)
         self.log("moved accounts into the app folder")
 
+    # nguyenphi37
     def adopt_zalo(self) -> None:
         if self._scan_zalo(self.zalo_dir):
             return
@@ -1487,6 +1570,7 @@ class DueCore:
         self._clear_job()
         self.log(f"moved Zalo into {self.zalo_dir}")
 
+    # nguyenphi37
     def _take_windows_profile(self, source: Path) -> None:
         account_id = "00000000-0000-4000-8000-000000000001"
         profile = self.profile_path(account_id)
@@ -1507,6 +1591,7 @@ class DueCore:
         self._clear_job()
         self.log("moved the Windows Zalo profile into an account")
 
+    # nguyenphi37
     def retire_external_zalo(self) -> None:
         if not self._scan_zalo(self.zalo_dir):
             return
@@ -1528,6 +1613,7 @@ class DueCore:
         else:
             updater.rmdir()
 
+    # nguyenphi37
     def _remove_uninstall_key(self) -> None:
         path = r"Software\Microsoft\Windows\CurrentVersion\Uninstall"
         try:
@@ -1552,11 +1638,13 @@ class DueCore:
         except OSError as exc:
             self.log(f"uninstall key: {exc}")
 
+    # nguyenphi37
     def _custom_photo(self, account_id: str) -> Path | None:
         profile = self.profile_path(account_id)
         matches = sorted(profile.glob("custom-icon.*"))
         return matches[0] if matches else None
 
+    # nguyenphi37
     def prepare_taskbar(self, account: dict) -> Path:
         profile = self.profile_path(account["id"])
         profile.mkdir(parents=True, exist_ok=True)
@@ -1564,13 +1652,16 @@ class DueCore:
         write_taskbar_icon(icon, account["name"], self._custom_photo(account["id"]), account["id"])
         return icon
 
+    # nguyenphi37
     def _shortcut_folder(self) -> Path:
         return Path(os.environ["APPDATA"]) / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "Due"
 
+    # nguyenphi37
     def _shortcut_path(self, account: dict) -> Path:
         safe = "".join(ch for ch in account["name"] if ch not in '<>:"/\\|?*').strip() or "Zalo"
         return self._shortcut_folder() / account["id"][:8] / f"{safe}.lnk"
 
+    # nguyenphi37
     def remove_toast_shortcut(self, account_id: str) -> None:
         folder = self._shortcut_folder()
         if not folder.exists():
@@ -1581,6 +1672,7 @@ class DueCore:
         if nested.is_dir():
             shutil.rmtree(nested, ignore_errors=True)
 
+    # nguyenphi37
     def publish_taskbar(self, account: dict, exe: Path, dll: Path, launch: Path, icon: Path) -> None:
         profile = self.profile_path(account["id"])
 
@@ -1613,6 +1705,7 @@ class DueCore:
             account["name"],
         )
 
+    # nguyenphi37
     def set_account_icon(self, account_id: str, source: str) -> None:
         src = Path(source)
         if src.suffix.lower() != ".png" or not _is_png(src):
@@ -1629,6 +1722,7 @@ class DueCore:
         shutil.copy2(src, dest)
         self._publish_account(account)
 
+    # nguyenphi37
     def read_pid(self, profile: Path) -> int | None:
         file = profile / "due.pid"
         if not file.exists():
@@ -1638,6 +1732,7 @@ class DueCore:
         except ValueError:
             return None
 
+    # nguyenphi37
     def running_pid(self, account_id: str) -> int | None:
         profile = self.profile_path(account_id)
         with self._lock:
@@ -1659,9 +1754,11 @@ class DueCore:
             return None
         return pid
 
+    # nguyenphi37
     def account_running(self, account_id: str) -> bool:
         return self.running_pid(account_id) is not None
 
+    # nguyenphi37
     def state(self) -> dict:
         version = self.zalo_version()
         with self._lock:
@@ -1705,6 +1802,7 @@ class DueCore:
             "error": error,
         }
 
+    # nguyenphi37
     def add_account(self, name: str) -> dict:
         cleaned = clean_name(name)
         account = {"id": str(uuid.uuid4()), "name": cleaned, "created": time.strftime("%Y-%m-%dT%H:%M:%S")}
@@ -1715,6 +1813,7 @@ class DueCore:
         self.profile_path(account["id"]).mkdir(parents=True, exist_ok=True)
         return account
 
+    # nguyenphi37
     def account_usage(self, account_id: str, running: bool | None = None) -> dict:
         now = time.monotonic()
         with self._lock:
@@ -1743,6 +1842,7 @@ class DueCore:
             "zaloLocation": volume_caption(str(Path.home().drive or "C:")),
         }
 
+    # nguyenphi37
     def clear_cache(self, account_id: str) -> None:
         if self.account_running(account_id):
             raise DueError("Đóng tài khoản trước khi xóa bộ nhớ đệm")
@@ -1756,11 +1856,13 @@ class DueCore:
             self._usage.pop(account_id, None)
             self.last_error = None
 
+    # nguyenphi37
     def open_folder(self, account_id: str) -> None:
         profile = self.profile_path(account_id)
         profile.mkdir(parents=True, exist_ok=True)
         os.startfile(profile)  # type: ignore[attr-defined]
 
+    # nguyenphi37
     def rename_account(self, account_id: str, name: str) -> None:
         cleaned = clean_name(name)
         with self._lock:
@@ -1777,6 +1879,7 @@ class DueCore:
                 launch, dll = self.tools_for(exe)
                 self.publish_taskbar(snapshot, exe, dll, launch, icon)
 
+    # nguyenphi37
     def remove_account(self, account_id: str) -> None:
         profile = self.profile_path(account_id)
         self.remove_toast_shortcut(account_id)
@@ -1788,6 +1891,7 @@ class DueCore:
         if profile.exists() or is_reparse(profile):
             safe_rmtree(profile)
 
+    # nguyenphi37
     def launch_program(
         self,
         profile: Path,
@@ -1836,6 +1940,7 @@ class DueCore:
             (profile / "due.pid").write_text(str(pid), encoding="utf-8")
         return pid
 
+    # nguyenphi37
     def _nudge_show(self, account_id: str, original_pid: int) -> None:
         """Start a second Zalo just long enough for it to call BrowserWindow.show()."""
         profile = self.profile_path(account_id)
@@ -1864,6 +1969,7 @@ class DueCore:
 
         threading.Thread(target=reap, name="due-nudge", daemon=True).start()
 
+    # nguyenphi37
     def _reveal_account(self, account_id: str, pid: int) -> None:
         with self._lock:
             name = self._account(account_id)["name"]
@@ -1888,6 +1994,7 @@ class DueCore:
             _force_foreground(located[0])
         raise DueError("Không hiện lại được cửa sổ Zalo")
 
+    # nguyenphi37
     def _stash_account(self, account_id: str, pid: int) -> None:
         with self._lock:
             name = self._account(account_id)["name"]
@@ -1899,6 +2006,7 @@ class DueCore:
             hide_account_window(name)
             time.sleep(0.25)
 
+    # nguyenphi37
     def open_account(self, account_id: str, *, during_update: bool = False, hidden: bool = False) -> None:
         with self._lock:
             if self.job and not during_update:
@@ -1943,6 +2051,7 @@ class DueCore:
             raise DueError("Cửa sổ Zalo đóng ngay sau khi mở." + note)
         self.log(f"opened {account_id} pid {pid}" + (" hidden" if hidden else ""))
 
+    # nguyenphi37
     def close_account(self, account_id: str) -> None:
         profile = self.profile_path(account_id)
         pid = self.read_pid(profile)
@@ -1952,6 +2061,7 @@ class DueCore:
         if file.exists():
             file.unlink()
 
+    # nguyenphi37
     def zalo_pids(self) -> list[int]:
         exe = self.find_zalo()
         if exe is None:
@@ -1966,6 +2076,7 @@ class DueCore:
                 found.append(pid)
         return found
 
+    # nguyenphi37
     def stop_zalo(self) -> None:
         targets: set[int] = set()
         for pid in self.zalo_pids():
@@ -1980,15 +2091,18 @@ class DueCore:
             if file.exists():
                 file.unlink(missing_ok=True)
 
+    # nguyenphi37
     def _set_job(self, kind: str, message: str, progress: float | None) -> None:
         with self._lock:
             self.job = {"kind": kind, "message": message, "progress": progress}
 
+    # nguyenphi37
     def _clear_job(self, error: str | None = None) -> None:
         with self._lock:
             self.job = None
             self.last_error = error
 
+    # nguyenphi37
     def _publish_account(self, account: dict) -> None:
         exe = self.find_zalo()
         if exe is None:
@@ -2003,12 +2117,14 @@ class DueCore:
         icon = self.prepare_taskbar(account)
         self.publish_taskbar(account, exe, dll, launch, icon)
 
+    # nguyenphi37
     def start_housekeeping(self) -> None:
         if self._housekeeping:
             return
         self._housekeeping = True
         threading.Thread(target=self._housekeeping_loop, name="due-housekeeping", daemon=True).start()
 
+    # nguyenphi37
     def _housekeeping_loop(self) -> None:
         try:
             self._refresh_shortcuts()
@@ -2033,12 +2149,14 @@ class DueCore:
                 next_check = time.monotonic() + UPDATE_RETRY_SECONDS
             time.sleep(5)
 
+    # nguyenphi37
     def _refresh_shortcuts(self) -> None:
         with self._lock:
             accounts = [dict(item) for item in self.accounts]
         for account in accounts:
             self._publish_account(account)
 
+    # nguyenphi37
     def _stop_foreign_updates(self) -> None:
         for pid, _parent, name in iter_processes():
             image = image_path(pid) or ""
@@ -2046,12 +2164,14 @@ class DueCore:
                 self.log(f"stopped Zalo updater pid {pid}")
                 taskkill(pid, tree=Path(image).name.lower() != "zalo.exe")
 
+    # nguyenphi37
     def _account_pids(self, account_id: str) -> set[int]:
         root = self.read_pid(self.profile_path(account_id))
         if root is None:
             return set()
         return descendant_pids(root)
 
+    # nguyenphi37
     def _tree_busy(self, pids: set[int], front: int | None) -> bool:
         if front is not None and front in pids:
             return True
@@ -2061,6 +2181,7 @@ class DueCore:
                 return True
         return False
 
+    # nguyenphi37
     def _busy_for_update(self) -> bool:
         front = foreground_pid()
         with self._lock:
@@ -2072,14 +2193,17 @@ class DueCore:
                 return True
         return False
 
+    # nguyenphi37
     def _check_requested(self) -> bool:
         with self._lock:
             return self._check_soon
 
+    # nguyenphi37
     def _consume_check_request(self) -> None:
         with self._lock:
             self._check_soon = False
 
+    # nguyenphi37
     def _release_efficiency(self) -> None:
         with self._lock:
             account_ids = list(self._saving)
@@ -2090,6 +2214,7 @@ class DueCore:
             self._mark_saving(account_id, False)
             self._trimmed_at.pop(account_id, None)
 
+    # nguyenphi37
     def _tune_accounts(self) -> None:
         with self._lock:
             efficiency = bool(self.settings.get("efficiency", True))
@@ -2132,6 +2257,7 @@ class DueCore:
                 self._mark_saving(account_id, True)
                 self.log(f"efficiency {account_id}")
 
+    # nguyenphi37
     def _mark_saving(self, account_id: str, enabled: bool) -> None:
         with self._lock:
             if enabled:
@@ -2139,17 +2265,20 @@ class DueCore:
             else:
                 self._saving.discard(account_id)
 
+    # nguyenphi37
     def _remember_latest(self, current: str, available: str) -> bool:
         newer = version_parts(available)[:3] > version_parts(current)[:3]
         with self._lock:
             self._latest = available if newer else None
         return newer
 
+    # nguyenphi37
     def _open_account_ids(self) -> list[str]:
         with self._lock:
             account_ids = [item["id"] for item in self.accounts]
         return [account_id for account_id in account_ids if self.account_running(account_id)]
 
+    # nguyenphi37
     def _reopen_accounts(self, account_ids: list[str]) -> None:
         for account_id in account_ids:
             try:
@@ -2159,6 +2288,7 @@ class DueCore:
                 with self._lock:
                     self.last_error = str(exc)
 
+    # nguyenphi37
     def _maybe_autoupdate(self) -> bool:
         if self.find_zalo() is None:
             with self._lock:
@@ -2190,6 +2320,7 @@ class DueCore:
             return True
         return False
 
+    # nguyenphi37
     def start_install(self, *, update: bool) -> None:
         with self._lock:
             if self.job:
@@ -2199,6 +2330,7 @@ class DueCore:
         thread = threading.Thread(target=self._install_worker, args=(update,), daemon=True)
         thread.start()
 
+    # nguyenphi37
     def _install_worker(self, update: bool) -> None:
         reopen: list[str] = []
         try:
@@ -2245,6 +2377,7 @@ class DueCore:
             if reopen:
                 self._reopen_accounts(reopen)
 
+    # nguyenphi37
     def _download(self, url: str, dest: Path) -> None:
         dest.parent.mkdir(parents=True, exist_ok=True)
         temp = dest.with_suffix(".part")
@@ -2272,6 +2405,7 @@ class DueCore:
                 raise DueError("File tải về không phải chương trình cài đặt")
         temp.replace(dest)
 
+    # nguyenphi37
     def _run_setup(self, setup: Path) -> None:
         silent = run_hidden([str(setup), "/S"], timeout=900, check=False)
         for _ in range(30):

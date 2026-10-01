@@ -16,6 +16,7 @@ from tray import DueTray
 _instance_mutex = None
 
 
+# nguyenphi37
 def pick_png() -> str:
     import clr
 
@@ -40,6 +41,7 @@ def pick_png() -> str:
     return holder.get("path", "")
 
 
+# nguyenphi37
 def claim_single_instance() -> None:
     global _instance_mutex
     kernel = ctypes.WinDLL("kernel32", use_last_error=True)
@@ -51,7 +53,9 @@ def claim_single_instance() -> None:
         sys.exit(0)
 
 
+# nguyenphi37
 class Api:
+    # nguyenphi37
     def __init__(self) -> None:
         self.core = DueCore()
         self.core.start_housekeeping()
@@ -64,27 +68,32 @@ class Api:
             self.core.log(f"startup registry: {exc}")
         self.core.launch_startup_accounts()
 
+    # nguyenphi37
     def attach(self, window) -> None:
         self._window = window
         window.events.maximized += lambda: self._sync_maximized(True)
         window.events.restored += lambda: self._sync_maximized(False)
         window.events.closing += self._on_closing
 
+    # nguyenphi37
     def _on_closing(self) -> bool:
         if self._quitting:
             return True
         self.hide_window()
         return False
 
+    # nguyenphi37
     def hide_window(self) -> None:
         if self._window is not None:
             self._window.hide()
 
+    # nguyenphi37
     def reveal_window(self) -> None:
         if self._window is not None:
             self._window.show()
         focus_title("Zalo Due")
 
+    # nguyenphi37
     def quit_app(self) -> None:
         self._quitting = True
         try:
@@ -94,6 +103,7 @@ class Api:
         if self._window is not None:
             self._window.destroy()
 
+    # nguyenphi37
     def _sync_maximized(self, enabled: bool) -> None:
         self._maximized = enabled
         if self._window is None:
@@ -103,11 +113,13 @@ class Api:
         except Exception:
             return
 
+    # nguyenphi37
     def minimize(self) -> dict:
         if self._window is not None:
             self._window.minimize()
         return {"ok": True}
 
+    # nguyenphi37
     def toggle_maximize(self) -> dict:
         if self._window is None:
             return {"ok": True, "maximized": False}
@@ -117,46 +129,60 @@ class Api:
             self._window.maximize()
         return {"ok": True, "maximized": not self._maximized}
 
+    # nguyenphi37
     def close_window(self) -> dict:
         self.hide_window()
         return {"ok": True}
 
+    # nguyenphi37
     def state(self) -> dict:
         return self.core.state()
 
+    # nguyenphi37
     def add_account(self, name: str) -> dict:
         return self._call(lambda: self.core.add_account(name))
 
+    # nguyenphi37
     def rename_account(self, account_id: str, name: str) -> dict:
         return self._call(lambda: self.core.rename_account(account_id, name))
 
+    # nguyenphi37
     def remove_account(self, account_id: str) -> dict:
         return self._call(lambda: self.core.remove_account(account_id))
 
+    # nguyenphi37
     def open_account(self, account_id: str) -> dict:
         return self._call(lambda: self.core.open_account(account_id))
 
+    # nguyenphi37
     def close_account(self, account_id: str) -> dict:
         return self._call(lambda: self.core.close_account(account_id))
 
+    # nguyenphi37
     def install_zalo(self) -> dict:
         return self._call(lambda: self.core.start_install(update=False))
 
+    # nguyenphi37
     def update_zalo(self) -> dict:
         return self._call(lambda: self.core.start_install(update=True))
 
+    # nguyenphi37
     def set_setting(self, key: str, enabled: bool) -> dict:
         return self._call(lambda: self.core.set_setting(key, enabled))
 
+    # nguyenphi37
     def set_account_startup(self, account_id: str, enabled: bool) -> dict:
         return self._call(lambda: self.core.set_account_startup(account_id, enabled))
 
+    # nguyenphi37
     def clear_cache(self, account_id: str) -> dict:
         return self._call(lambda: self.core.clear_cache(account_id))
 
+    # nguyenphi37
     def open_folder(self, account_id: str) -> dict:
         return self._call(lambda: self.core.open_folder(account_id))
 
+    # nguyenphi37
     def choose_icon(self, account_id: str) -> dict:
         def pick() -> dict:
             path = pick_png()
@@ -167,6 +193,7 @@ class Api:
 
         return self._call(pick)
 
+    # nguyenphi37
     def _call(self, action) -> dict:
         try:
             result = action()
@@ -181,12 +208,14 @@ class Api:
             return {"ok": False, "error": str(exc)}
 
 
+# nguyenphi37
 def ui_file() -> Path:
     if getattr(sys, "frozen", False):
         return Path(getattr(sys, "_MEIPASS")) / "ui" / "index.html"
     return Path(__file__).resolve().parent / "ui" / "index.html"
 
 
+# nguyenphi37
 def webview2_ready() -> bool:
     client = "{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}"
     paths = [
@@ -205,6 +234,7 @@ def webview2_ready() -> bool:
     return False
 
 
+# nguyenphi37
 def ensure_webview2(cache: Path) -> None:
     if webview2_ready():
         return
@@ -240,6 +270,7 @@ def ensure_webview2(cache: Path) -> None:
         sys.exit(1)
 
 
+# nguyenphi37
 def prefer_dark_menus() -> None:
     try:
         uxtheme = ctypes.WinDLL("uxtheme", use_last_error=True)
@@ -257,6 +288,7 @@ def prefer_dark_menus() -> None:
         return
 
 
+# nguyenphi37
 def main() -> None:
     prefer_dark_menus()
     claim_single_instance()

@@ -18,6 +18,7 @@ std::wstring g_resultPath;
 std::wstring ToLower(std::wstring value);
 bool TrustedProfile(const std::wstring& lower);
 
+// nguyenphi37
 void WriteResult(bool ok, const std::wstring& detail) {
     std::wstring lower = ToLower(g_root);
     if (g_resultPath.empty() || !TrustedProfile(lower)) {
@@ -40,6 +41,7 @@ void WriteResult(bool ok, const std::wstring& detail) {
     MoveFileExW(temp.c_str(), g_resultPath.c_str(), MOVEFILE_REPLACE_EXISTING);
 }
 
+// nguyenphi37
 std::wstring ToLower(std::wstring value) {
     for (wchar_t& ch : value) {
         ch = static_cast<wchar_t>(towlower(ch));
@@ -47,6 +49,7 @@ std::wstring ToLower(std::wstring value) {
     return value;
 }
 
+// nguyenphi37
 bool ValidId(const std::wstring& id) {
     const int groups[] = {8, 4, 4, 4, 12};
     int group = 0;
@@ -71,11 +74,13 @@ bool ValidId(const std::wstring& id) {
     return group == 4 && count == 12;
 }
 
+// nguyenphi37
 bool EndsWith(const std::wstring& value, const std::wstring& suffix) {
     return value.size() >= suffix.size() &&
            value.compare(value.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
+// nguyenphi37
 bool TrustedProfile(const std::wstring& lower) {
     return lower.find(L"\\data\\profiles\\") != std::wstring::npos ||
            lower.find(L"\\data\\selftest\\") != std::wstring::npos ||
@@ -83,6 +88,7 @@ bool TrustedProfile(const std::wstring& lower) {
            lower.find(L"\\due\\selftest\\") != std::wstring::npos;
 }
 
+// nguyenphi37
 bool RootMatches(const std::wstring& root, const std::wstring& id) {
     std::wstring lower = ToLower(root);
     std::wstring lid = ToLower(id);
@@ -90,6 +96,7 @@ bool RootMatches(const std::wstring& root, const std::wstring& id) {
            EndsWith(lower, L"\\due\\profiles\\" + lid) || EndsWith(lower, L"\\due\\selftest\\" + lid);
 }
 
+// nguyenphi37
 std::wstring Quote(const std::wstring& value) {
     std::wstring out = L"\"";
     for (wchar_t ch : value) {
@@ -102,10 +109,12 @@ std::wstring Quote(const std::wstring& value) {
     return out;
 }
 
+// nguyenphi37
 void EnsureDir(const std::wstring& path) {
     CreateDirectoryW(path.c_str(), nullptr);
 }
 
+// nguyenphi37
 std::wstring EnvBlock(const std::vector<std::pair<std::wstring, std::wstring>>& overrides) {
     std::vector<std::pair<std::wstring, std::wstring>> entries;
     std::vector<std::wstring> hidden;
@@ -154,6 +163,7 @@ std::wstring EnvBlock(const std::vector<std::pair<std::wstring, std::wstring>>& 
     return block;
 }
 
+// nguyenphi37
 const wchar_t* ArgValue(int argc, wchar_t** argv, const wchar_t* name, int& index) {
     if (index + 1 >= argc || _wcsicmp(argv[index], name) != 0) {
         return nullptr;
@@ -164,6 +174,7 @@ const wchar_t* ArgValue(int argc, wchar_t** argv, const wchar_t* name, int& inde
 
 }  // namespace
 
+// nguyenphi37
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
     int argc = 0;
     LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);

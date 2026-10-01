@@ -30,6 +30,7 @@ const mock = {
   error: null,
 };
 
+// nguyenphi37
 function sealLetter(name) {
   const trimmed = name.trim();
   return trimmed ? trimmed.charAt(0).toUpperCase() : "?";
@@ -40,6 +41,7 @@ const ICONS = {
   storage: '<svg viewBox="0 0 16 16" aria-hidden="true"><ellipse cx="8" cy="4" rx="5" ry="2"/><path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4"/><path d="M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/></svg>',
 };
 
+// nguyenphi37
 function el(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -47,6 +49,7 @@ function el(tag, className, text) {
   return node;
 }
 
+// nguyenphi37
 function iconButton(action, label, icon) {
   const button = el("button", "icon-btn");
   button.type = "button";
@@ -57,6 +60,7 @@ function iconButton(action, label, icon) {
   return button;
 }
 
+// nguyenphi37
 function formatBytes(bytes) {
   const value = Number(bytes) || 0;
   if (value >= 1024 ** 3) {
@@ -71,11 +75,13 @@ function formatBytes(bytes) {
   return "0 MB";
 }
 
+// nguyenphi37
 function formatRam(bytes) {
   const mb = (Number(bytes) || 0) / 1024 ** 2;
   return `${mb.toFixed(1)} MB`;
 }
 
+// nguyenphi37
 function idleLabel(account, efficiencyOn) {
   if (!account.running || !efficiencyOn) return "";
   if (account.saving) return "CPU thấp, RAM được trả bớt. Vẫn nhận tin.";
@@ -84,11 +90,13 @@ function idleLabel(account, efficiencyOn) {
   return `Giảm RAM sau ${minutes} phút không dùng`;
 }
 
+// nguyenphi37
 function showBanner(message) {
   banner.hidden = !message;
   banner.textContent = message || "";
 }
 
+// nguyenphi37
 function renderJob(next) {
   if (!next.job) {
     job.hidden = true;
@@ -106,6 +114,7 @@ function renderJob(next) {
   }
 }
 
+// nguyenphi37
 function renderPrefs(next) {
   const installed = Boolean(next.zalo && next.zalo.installed);
   settingsBtn.hidden = !installed;
@@ -117,12 +126,14 @@ function renderPrefs(next) {
   });
 }
 
+// nguyenphi37
 function closeSettings() {
   settingsPop.hidden = true;
   settingsBtn.classList.remove("is-on");
   settingsBtn.setAttribute("aria-expanded", "false");
 }
 
+// nguyenphi37
 function toggleSettings() {
   if (settingsPop.hidden) {
     closePopover();
@@ -134,6 +145,7 @@ function toggleSettings() {
   closeSettings();
 }
 
+// nguyenphi37
 function renderHeader(next) {
   const installed = Boolean(next.zalo.installed);
   const version = next.zalo.version ? next.zalo.version.split(".").slice(0, 3).join(".") : "";
@@ -148,6 +160,7 @@ function renderHeader(next) {
   zaloAction.disabled = Boolean(next.job);
 }
 
+// nguyenphi37
 function accountCard(account, installed, efficiencyOn) {
   const saving = Boolean(account.saving);
   const card = el("article", "card" + (account.running ? " running" : "") + (saving ? " saving" : ""));
@@ -197,6 +210,7 @@ function accountCard(account, installed, efficiencyOn) {
   return card;
 }
 
+// nguyenphi37
 function meterRow(account) {
   const row = el("div", "meters");
   const disk = el("div", "meter");
@@ -217,6 +231,7 @@ function meterRow(account) {
   return row;
 }
 
+// nguyenphi37
 function bootSwitch(account) {
   const button = el("button", "boot");
   button.type = "button";
@@ -229,6 +244,7 @@ function bootSwitch(account) {
   return button;
 }
 
+// nguyenphi37
 function storageRow(label, bytes, usageName, ram) {
   const row = el("div", "usage-row");
   row.append(el("span", "", label));
@@ -238,6 +254,7 @@ function storageRow(label, bytes, usageName, ram) {
   return row;
 }
 
+// nguyenphi37
 function storagePanel(account) {
   const panel = el("div", "menu menu-float");
   panel.dataset.popover = "storage";
@@ -271,6 +288,7 @@ function storagePanel(account) {
   return panel;
 }
 
+// nguyenphi37
 function editPopover(account) {
   const panel = el("div", "menu menu-float");
   panel.dataset.popover = "edit";
@@ -298,6 +316,7 @@ function editPopover(account) {
   return panel;
 }
 
+// nguyenphi37
 function closePopover() {
   editing = null;
   storageId = null;
@@ -305,6 +324,7 @@ function closePopover() {
   stage.querySelectorAll(".icon-btn.is-on").forEach((button) => button.classList.remove("is-on"));
 }
 
+// nguyenphi37
 function placeMenu(panel, anchor) {
   const rect = anchor.getBoundingClientRect();
   const width = panel.offsetWidth;
@@ -317,6 +337,7 @@ function placeMenu(panel, anchor) {
   panel.style.top = `${top}px`;
 }
 
+// nguyenphi37
 function mountPopover() {
   document.querySelectorAll(".menu-float").forEach((node) => node.remove());
   stage.querySelectorAll(".icon-btn.is-on").forEach((button) => button.classList.remove("is-on"));
@@ -337,6 +358,7 @@ function mountPopover() {
   }
 }
 
+// nguyenphi37
 function addCard() {
   const button = el("button", "add");
   button.type = "button";
@@ -346,6 +368,7 @@ function addCard() {
   return button;
 }
 
+// nguyenphi37
 function addForm() {
   const card = el("form", "card");
   card.dataset.adding = "1";
@@ -366,6 +389,7 @@ function addForm() {
   return card;
 }
 
+// nguyenphi37
 function renderStage(next) {
   stage.replaceChildren();
   const fresh = !next.zalo.installed && next.accounts.length === 0 && !adding;
@@ -403,6 +427,7 @@ function renderStage(next) {
   mountPopover();
 }
 
+// nguyenphi37
 function gridSnapshot(next) {
   return JSON.stringify({
     installed: Boolean(next.zalo && next.zalo.installed),
@@ -418,6 +443,7 @@ function gridSnapshot(next) {
   });
 }
 
+// nguyenphi37
 function patchUsage(next) {
   const efficiencyOn = Boolean(next.settings && next.settings.efficiency !== false);
   for (const account of next.accounts || []) {
@@ -437,6 +463,7 @@ function patchUsage(next) {
   }
 }
 
+// nguyenphi37
 function draw(next, options) {
   state = next;
   renderHeader(next);
@@ -462,6 +489,7 @@ function draw(next, options) {
   renderStage(next);
 }
 
+// nguyenphi37
 async function call(method, ...args) {
   if (preview) return mockCall(method, ...args);
   try {
@@ -474,6 +502,7 @@ async function call(method, ...args) {
   }
 }
 
+// nguyenphi37
 function mockCall(method, ...args) {
   if (method === "add_account") {
     mock.accounts.push({ id: String(Date.now()), name: args[0], running: false });
@@ -510,12 +539,14 @@ function mockCall(method, ...args) {
   return { ok: true };
 }
 
+// nguyenphi37
 async function refresh() {
   if (preview) return;
   const next = await window.pywebview.api.state();
   draw(next);
 }
 
+// nguyenphi37
 function openModal(title, body, okLabel, action) {
   pendingModal = action;
   modalTitle.textContent = title;
@@ -525,6 +556,7 @@ function openModal(title, body, okLabel, action) {
   modalCancel.focus();
 }
 
+// nguyenphi37
 function closeModal() {
   modal.hidden = true;
   pendingModal = null;

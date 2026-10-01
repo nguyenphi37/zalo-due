@@ -14,10 +14,12 @@ namespace {
 constexpr wchar_t kRecv[] = L"\\\\.\\pipe\\PipeZCallRecv";
 constexpr wchar_t kSend[] = L"\\\\.\\pipe\\PipeZCallSend";
 
+// nguyenphi37
 void Report(const wchar_t* label, DWORD error = 0) {
     std::fwprintf(stderr, L"%ls%s%lu\n", label, error ? L" error=" : L"", error);
 }
 
+// nguyenphi37
 bool CallName(const wchar_t* arg, const wchar_t** name) {
     if (_wcsicmp(arg, L"recv") == 0) *name = kRecv;
     else if (_wcsicmp(arg, L"send") == 0) *name = kSend;
@@ -25,6 +27,7 @@ bool CallName(const wchar_t* arg, const wchar_t** name) {
     return true;
 }
 
+// nguyenphi37
 int Server(const wchar_t* arg, const wchar_t* token, bool ansi) {
     const wchar_t* name = nullptr;
     if (!CallName(arg, &name) || !*token || !GetEnvironmentVariableW(L"DUE_PROFILE_ID", nullptr, 0)) return 2;
@@ -52,6 +55,7 @@ int Server(const wchar_t* arg, const wchar_t* token, bool ansi) {
     return ok ? 0 : 11;
 }
 
+// nguyenphi37
 int Client(const wchar_t* arg, const wchar_t* expected, bool ansi) {
     const wchar_t* name = nullptr;
     wchar_t id[64]{};
@@ -82,6 +86,7 @@ int Client(const wchar_t* arg, const wchar_t* expected, bool ansi) {
     return ok ? 0 : 21;
 }
 
+// nguyenphi37
 bool LocalRoundTrip(const std::wstring& name) {
     HANDLE pipe = CreateNamedPipeW(name.c_str(), PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE,
         PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT, 1, 16, 16, 0, nullptr);
@@ -100,6 +105,7 @@ bool LocalRoundTrip(const std::wstring& name) {
 }
 }
 
+// nguyenphi37
 int wmain(int argc, wchar_t** argv) {
     if (argc == 4 && (_wcsicmp(argv[1], L"--server") == 0 || _wcsicmp(argv[1], L"--server-a") == 0))
         return Server(argv[2], argv[3], _wcsicmp(argv[1], L"--server-a") == 0);

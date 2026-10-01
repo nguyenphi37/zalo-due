@@ -64,6 +64,7 @@ LRESULT = ctypes.c_ssize_t
 WNDPROC = ctypes.WINFUNCTYPE(LRESULT, wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
 
 
+# nguyenphi37
 class WNDCLASSEXW(ctypes.Structure):
     _fields_ = [
         ("cbSize", wintypes.UINT),
@@ -81,6 +82,7 @@ class WNDCLASSEXW(ctypes.Structure):
     ]
 
 
+# nguyenphi37
 class NOTIFYICONDATAW(ctypes.Structure):
     _fields_ = [
         ("cbSize", wintypes.DWORD),
@@ -101,6 +103,7 @@ class NOTIFYICONDATAW(ctypes.Structure):
     ]
 
 
+# nguyenphi37
 class MENUITEMINFOW(ctypes.Structure):
     _fields_ = [
         ("cbSize", wintypes.UINT),
@@ -118,6 +121,7 @@ class MENUITEMINFOW(ctypes.Structure):
     ]
 
 
+# nguyenphi37
 class MSG(ctypes.Structure):
     _fields_ = [
         ("hwnd", wintypes.HWND),
@@ -129,6 +133,7 @@ class MSG(ctypes.Structure):
     ]
 
 
+# nguyenphi37
 class BITMAPINFOHEADER(ctypes.Structure):
     _fields_ = [
         ("biSize", wintypes.DWORD),
@@ -145,6 +150,7 @@ class BITMAPINFOHEADER(ctypes.Structure):
     ]
 
 
+# nguyenphi37
 class BITMAPINFO(ctypes.Structure):
     _fields_ = [("bmiHeader", BITMAPINFOHEADER), ("bmiColors", wintypes.DWORD * 1)]
 
@@ -262,6 +268,7 @@ kernel32.GetModuleHandleW.argtypes = [wintypes.LPCWSTR]
 kernel32.GetModuleHandleW.restype = wintypes.HMODULE
 
 
+# nguyenphi37
 def _bitmap_from_icon(hicon, size: int):
     screen = user32.GetDC(None)
     if not screen:
@@ -299,12 +306,15 @@ def _bitmap_from_icon(hicon, size: int):
     return bitmap
 
 
+# nguyenphi37
 def _load_icon(path: Path, size: int):
     handle = user32.LoadImageW(None, str(path), IMAGE_ICON, size, size, LR_LOADFROMFILE)
     return handle or None
 
 
+# nguyenphi37
 class DueTray:
+    # nguyenphi37
     def __init__(self, api, icon: Path) -> None:
         self._api = api
         self._icon_path = Path(icon)
@@ -317,11 +327,13 @@ class DueTray:
         self._class_name = ctypes.create_unicode_buffer("ZaloDue.Tray")
         self._arrow = user32.LoadCursorW(None, IDC_ARROW)
 
+    # nguyenphi37
     def start(self) -> None:
         self._thread = threading.Thread(target=self._run, name="due-tray", daemon=True)
         self._thread.start()
         self._ready.wait(5)
 
+    # nguyenphi37
     def stop(self) -> None:
         hwnd = self._hwnd
         if hwnd:
@@ -330,12 +342,14 @@ class DueTray:
         if thread is not None and thread.is_alive() and thread is not threading.current_thread():
             thread.join(2)
 
+    # nguyenphi37
     def _log(self, message: str) -> None:
         try:
             self._api.core.log(message)
         except Exception:
             return
 
+    # nguyenphi37
     def _run(self) -> None:
         instance = kernel32.GetModuleHandleW(None)
         window_class = WNDCLASSEXW()
@@ -374,6 +388,7 @@ class DueTray:
             user32.DispatchMessageW(ctypes.byref(message))
         self._remove_icon()
 
+    # nguyenphi37
     def _add_icon(self) -> None:
         icon = _load_icon(self._icon_path, 32) if self._icon_path.is_file() else None
         data = self._nid
@@ -391,6 +406,7 @@ class DueTray:
         data.uVersion = NOTIFYICON_VERSION_4
         shell32.Shell_NotifyIconW(NIM_SETVERSION, ctypes.byref(data))
 
+    # nguyenphi37
     def _remove_icon(self) -> None:
         if not self._added or not self._hwnd:
             return
@@ -400,10 +416,12 @@ class DueTray:
             user32.DestroyIcon(self._nid.hIcon)
             self._nid.hIcon = None
 
+    # nguyenphi37
     def _restore_cursor(self) -> None:
         if self._arrow:
             user32.SetCursor(self._arrow)
 
+    # nguyenphi37
     def _wndproc(self, hwnd, msg, wparam, lparam):
         if msg == WM_APP:
             # Explorer sets the loading cursor until this returns. Do no work here.
@@ -430,10 +448,12 @@ class DueTray:
             return 0
         return user32.DefWindowProcW(hwnd, msg, wparam, lparam)
 
+    # nguyenphi37
     def _dispatch_click(self, hwnd, click: int) -> None:
         if click in (WM_LBUTTONUP, WM_LBUTTONDBLCLK, WM_RBUTTONUP, WM_CONTEXTMENU):
             self._show_menu(hwnd)
 
+    # nguyenphi37
     def _show_menu(self, hwnd) -> None:
         accounts = []
         try:
@@ -488,6 +508,7 @@ class DueTray:
         elif command in chosen:
             self._activate_account(chosen[command])
 
+    # nguyenphi37
     def _insert_account(self, menu, index: int, item_id: int, name: str, bitmap) -> None:
         label = name.replace("&", "&&")
         text = ctypes.create_unicode_buffer(label)
@@ -504,6 +525,7 @@ class DueTray:
         if not user32.InsertMenuItemW(menu, index, True, ctypes.byref(info)):
             self._log(f"tray menu item failed {ctypes.get_last_error()}")
 
+    # nguyenphi37
     def _account_bitmap(self, path: str, size: int):
         if not path or not Path(path).is_file():
             return None
@@ -515,10 +537,12 @@ class DueTray:
         finally:
             user32.DestroyIcon(icon)
 
+    # nguyenphi37
     def _activate_account(self, account_id: str) -> None:
         self._restore_cursor()
         self._open_account(account_id)
 
+    # nguyenphi37
     def _open_account(self, account_id: str) -> None:
         def work() -> None:
             try:

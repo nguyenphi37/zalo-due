@@ -22,12 +22,14 @@ from due_core import (
 )
 
 
+# nguyenphi37
 def check(name: str, ok: bool, detail: str = "") -> None:
     print(("PASS " if ok else "FAIL ") + name + (f" — {detail}" if detail else ""))
     if not ok:
         raise SystemExit(1)
 
 
+# nguyenphi37
 def test_processes() -> None:
     pids = [pid for pid, _parent, _name in iter_processes()]
     check("list processes", os.getpid() in pids, f"count {len(pids)}")
@@ -35,6 +37,7 @@ def test_processes() -> None:
     check("read process path", image.lower().endswith("python.exe"), image)
 
 
+# nguyenphi37
 def test_guard() -> None:
     try:
         safe_rmtree(Path("C:/no-such-due-guard"))
@@ -44,6 +47,7 @@ def test_guard() -> None:
     check("refuse delete outside Due", False)
 
 
+# nguyenphi37
 def test_junction_delete() -> None:
     base = Path(tempfile.mkdtemp(prefix="due-safe-"))
     link = base / "profile" / "Local" / "Programs" / "Zalo"
@@ -64,6 +68,7 @@ def test_junction_delete() -> None:
         shutil.rmtree(base, ignore_errors=True)
 
 
+# nguyenphi37
 def test_profiles(arch: str) -> None:
     core = DueCore()
     core.stage_binaries()
