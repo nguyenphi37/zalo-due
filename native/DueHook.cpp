@@ -352,16 +352,7 @@ BOOL WINAPI MineCreateProcessW(LPCWSTR application, LPWSTR command, LPSECURITY_A
     }
     if (!InjectDll(information->hProcess, g_dllPath)) {
         DWORD error = GetLastError();
-        if (LooksLikeZaloImage(application, command)) {
-            Logf(L"refused unhooked Zalo child, error %lu", error);
-            TerminateProcess(information->hProcess, 1);
-            CloseHandle(information->hThread);
-            CloseHandle(information->hProcess);
-            ZeroMemory(information, sizeof(*information));
-            SetLastError(error);
-            return FALSE;
-        }
-        Logf(L"child inject failed (%lu), launching plain helper", error);
+        Logf(L"child inject failed (%lu), launching with inherited Due profile environment", error);
         if ((flags & CREATE_SUSPENDED) == 0) {
             ResumeThread(information->hThread);
         }
