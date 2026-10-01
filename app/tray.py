@@ -1,3 +1,4 @@
+# nguyenphi37
 """One tray icon for Zalo Due. Each account is a menu row, not its own icon."""
 
 from __future__ import annotations

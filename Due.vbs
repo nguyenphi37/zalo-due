@@ -1,3 +1,4 @@
+' nguyenphi37
 Set files = CreateObject("Scripting.FileSystemObject")
 folder = files.GetParentFolderName(WScript.ScriptFullName)
 Set shell = CreateObject("Wscript.Shell")

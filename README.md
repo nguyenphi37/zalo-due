@@ -1,4 +1,7 @@
+nguyenphi37
 # Zalo Due
+
+Bản phát hành 0.7.0 này được đánh dấu nguyenphi37.
 
 [Tiếng Việt](#tiếng-việt) · [English](#english)
 

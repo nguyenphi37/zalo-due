@@ -1,3 +1,4 @@
+# nguyenphi37
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 $dll = Join-Path $PSScriptRoot "native\build\x86\DueHook.dll"

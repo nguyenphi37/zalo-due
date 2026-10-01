@@ -1,3 +1,4 @@
+/* nguyenphi37 */
 const stage = document.querySelector("#stage");
 const settingsBtn = document.querySelector("#settings-btn");
 const settingsPop = document.querySelector("#settings-pop");

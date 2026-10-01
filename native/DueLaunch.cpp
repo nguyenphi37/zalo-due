@@ -1,3 +1,4 @@
+// nguyenphi37
 // Starts one Zalo (or a test program) with DueHook loaded and a private profile.
 
 #define WIN32_LEAN_AND_MEAN

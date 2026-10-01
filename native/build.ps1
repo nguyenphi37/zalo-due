@@ -1,3 +1,4 @@
+# nguyenphi37
 $ErrorActionPreference = "Stop"
 $vc = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build"
 $here = $PSScriptRoot

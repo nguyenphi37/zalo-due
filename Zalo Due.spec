@@ -1,3 +1,4 @@
+# nguyenphi37
 # -*- mode: python ; coding: utf-8 -*-
 from pathlib import Path
 from PyInstaller.utils.hooks import collect_all
