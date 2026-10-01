@@ -1657,6 +1657,7 @@ class DueCore:
             saving = set(self._saving)
             job = self.job
             error = self.last_error
+            self.last_error = None
             settings = dict(self.settings)
             idle_since = dict(self._idle_since)
             latest = self._latest
