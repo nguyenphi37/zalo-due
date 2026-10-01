@@ -1,26 +1,27 @@
 nguyenphi37
 # Zalo Due
 
-Bản phát hành 0.7.0 này được đánh dấu nguyenphi37.
-
-[Tiếng Việt](#tiếng-việt) · [English](#english)
-
-## Tiếng Việt
-
-Chạy nhiều tài khoản Zalo PC cùng lúc trên Windows. Mỗi tài khoản có cửa sổ, đăng nhập và file riêng. Zalo vẫn là bản chính thức và vẫn tự cập nhật.
+Chạy nhiều tài khoản Zalo PC cùng lúc trên Windows. Mỗi tài khoản một cửa sổ, một phiên đăng nhập, gọi thoại và gọi video riêng. Zalo vẫn là bản chính thức.
 
 Zalo Due không sửa chương trình Zalo. Nó chỉ cho mỗi tài khoản một thư mục dữ liệu riêng để các bản chạy song song.
 
-### Tải về và dùng
+## Tiếng Việt
 
-Vào [Releases](../../releases), tải `Zalo.Due.exe`, rồi mở file đó. Không cần cài Python hay Visual Studio.
+### Cách dùng
 
-- Lần đầu mở, app tự tải Zalo bản chính thức. Cần có mạng.
-- Bấm thêm tài khoản, quét mã QR bằng điện thoại.
-- Mỗi tài khoản là một cửa sổ Zalo riêng, mở cùng lúc không đè nhau.
-- Tài khoản, tin nhắn và file nằm trong thư mục `data` cạnh file exe. File exe tải về không chứa tài khoản của ai.
+1. Tải `Zalo.Due.exe` và mở. Không cần cài Python.
+2. Lần đầu, nếu máy đã cài Zalo, app hiện đang chuyển Zalo và dữ liệu vào thư mục `data` cạnh file exe. Tài khoản đó nằm trong app.
+3. Bấm **Thêm tài khoản**, đặt tên, quét mã QR trên điện thoại.
+4. Bấm **Mở** để chạy tài khoản. Nhiều tài khoản mở cùng lúc.
+5. Trong từng Zalo, gọi thoại và gọi video dùng bình thường.
+6. Bấm X để ẩn Due xuống khay. Chuột phải icon khay để hiện lại.
+7. Trong **Cài đặt** có **Khởi động cùng Windows**. Trên từng thẻ có **Mở cùng máy**: tài khoản đó tự chạy khi đăng nhập Windows.
+8. Thoát hết đóng mọi cửa sổ Zalo rồi tắt Due.
+9. Zalo cập nhật một lần, mọi tài khoản dùng chung bản đó.
 
-Muốn app chạy nền: bấm X để ẩn xuống khay. Bấm chuột phải vào icon khay để hiện lại. Trong Cài đặt có **Khởi động cùng Windows**, và mỗi tài khoản có công tắc **Mở cùng máy**.
+### Dữ liệu
+
+Tài khoản, tin nhắn và file nằm trong thư mục `data` cạnh `Zalo.Due.exe`. File tải về không chứa tài khoản của ai. Giữ thư mục `data` khi đổi file exe.
 
 Cần có [Microsoft Edge WebView2](https://developer.microsoft.com/microsoft-edge/webview2/). Windows hiện tại thường đã có sẵn.
 
@@ -52,27 +53,20 @@ File thành phẩm là `dist\Zalo Due.exe`.
 - Khóa "chỉ mở một cửa sổ" được tách theo từng tài khoản, nên các cửa sổ chạy cùng lúc.
 - Tiến trình Zalo mới, kể cả tiến trình cơ sở dữ liệu chạy nền, đều được tách theo.
 
-### Lưu ý
+### Ghi chú
 
-- Cuộc gọi thoại/video khi chạy nhiều tài khoản hiện chưa được xác minh hoạt động ổn định; có báo cáo không nhận được cuộc gọi. Bản phát hành này chưa sửa lỗi cuộc gọi.
-- Tài khoản, cài đặt và bản Zalo đã tải nằm trong thư mục `data` cạnh app. Thư mục này chỉ ở máy bạn, không nằm trong repo.
 - Phần native dùng [Microsoft Detours](https://github.com/microsoft/Detours), đặt ở `third_party/Detours-4.0.1` (giấy phép MIT).
 - Zalo là sản phẩm của VNG Corporation. Dự án này là trình chạy độc lập, không liên kết với VNG.
 
 ## English
 
-Run several Zalo PC accounts at the same time on Windows. Each account keeps its own window, login, and files. Zalo itself stays the official build and updates normally.
+See the Vietnamese guide above for full usage instructions. In short: run several Zalo PC accounts at the same time on Windows, each with its own window, login, and data folder, while Zalo stays the official build.
 
-Zalo Due does not modify the Zalo program. It only gives every account a separate data folder and lets those copies run side by side.
+- Download `Zalo.Due.exe` from [Releases](../../releases), open it, no Python needed.
+- Add an account, scan the QR code, then press **Open**. Accounts run side by side.
+- Accounts, messages, and files live in a `data` folder next to the exe. The download contains no one's account. Keep that folder when you swap the exe.
 
-## What you need
-
-- Windows 10 or 11, 64-bit
-- [Microsoft Edge WebView2](https://developer.microsoft.com/microsoft-edge/webview2/) (already present on current Windows)
-- Python 3.11 or newer
-- Visual Studio 2022 Build Tools with the **Desktop development with C++** workload, used once to build the native helper
-
-## Run from source
+Build from source needs Python 3.11+ and Visual Studio 2022 Build Tools with the **Desktop development with C++** workload:
 
 ```powershell
 python -m venv .venv
@@ -80,27 +74,4 @@ python -m venv .venv
 .\Due.cmd
 ```
 
-`Due.cmd` builds the native helper the first time, then opens Zalo Due. The window hides to the tray; right-click the tray icon and choose the window to bring it back.
-
-## Build the app
-
-```powershell
-.\native\build.cmd
-.\.venv\Scripts\pyinstaller --noconfirm "Zalo Due.spec"
-```
-
-The result is `dist\Zalo Due.exe`.
-
-## How accounts stay separate
-
-- One shared, official Zalo install. Updates apply once and every account gets them.
-- Each account gets its own folder for app data, documents, and downloads, so logins never overwrite each other.
-- The lock that normally stops a second Zalo is lifted per account, so the windows run together.
-- New Zalo processes inherit the same separation, including the hidden database process.
-
-## Notes
-
-- Voice/video calls with multiple accounts are not verified as reliable; incoming-call failures have been reported. This release does not fix calling.
-- Accounts, settings, and the downloaded Zalo live in a `data` folder next to the app. That folder is local and is not part of this repository.
-- The native helper links against [Microsoft Detours](https://github.com/microsoft/Detours), included under `third_party/Detours-4.0.1` (MIT license).
-- Zalo is a product of VNG Corporation. This project is an independent launcher and is not affiliated with VNG.
+Zalo is a product of VNG Corporation. This project is an independent launcher and is not affiliated with VNG.
