@@ -1480,9 +1480,31 @@ class DueCore:
         legacy = Path(os.environ["LOCALAPPDATA"]) / "Programs" / "Zalo"
         if not self._scan_zalo(legacy):
             return
+        self._set_job("move", "Đang chuyển Zalo vào Due", None)
         self.stop_zalo()
         shutil.move(str(legacy), str(self.zalo_dir))
+        self._clear_job()
         self.log(f"moved Zalo into {self.zalo_dir}")
+
+    def _take_windows_profile(self, source: Path) -> None:
+        account_id = "00000000-0000-4000-8000-000000000001"
+        profile = self.profile_path(account_id)
+        roaming = profile / "Roaming" / "ZaloData"
+        if roaming.exists():
+            return
+        self._set_job("move", "Đang chuyển dữ liệu Zalo vào tài khoản", None)
+        self.ensure_layout(profile, None)
+        shutil.move(str(source), str(roaming))
+        with self._lock:
+            if not any(item["id"] == account_id for item in self.accounts):
+                self.accounts.append({
+                    "id": account_id,
+                    "name": "Zalo Windows",
+                    "created": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                })
+                self._save_accounts()
+        self._clear_job()
+        self.log("moved the Windows Zalo profile into an account")
 
     def retire_external_zalo(self) -> None:
         if not self._scan_zalo(self.zalo_dir):
@@ -1493,8 +1515,8 @@ class DueCore:
         self._remove_uninstall_key()
         roaming = Path(os.environ["APPDATA"])
         leftover = roaming / "ZaloData"
-        if leftover.exists() and not is_reparse(leftover) and _no_login_browser_profile(leftover):
-            shutil.rmtree(leftover, ignore_errors=True)
+        if leftover.exists() and not is_reparse(leftover):
+            self._take_windows_profile(leftover)
         updater = roaming / "zalo-updater"
         if not updater.exists() or is_reparse(updater) or _same_dir(updater, self.updater_dir):
             return
