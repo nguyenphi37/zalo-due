@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zalo Due</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="chrome">
+    <div class="chrome-drag pywebview-drag-region">
+      <img class="brand-mark" src="logo.png" alt="Zalo Due">
+      <p class="tag">Nhiều tài khoản, một bản Zalo</p>
+    </div>
+    <div class="chrome-tools">
+      <p id="zalo-meta" class="meta">Đang kiểm tra</p>
+      <button id="zalo-action" class="btn btn-primary" type="button" hidden>Cập nhật</button>
+      <div class="settings">
+        <button id="settings-btn" class="icon-btn" type="button" aria-label="Cài đặt" aria-expanded="false" hidden>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4.5h4.2M9.8 4.5H14M2 8h7.2M11.8 8H14M2 11.5h2.2M7 11.5H14"/><circle cx="8" cy="4.5" r="1.5"/><circle cx="10.5" cy="8" r="1.5"/><circle cx="5.2" cy="11.5" r="1.5"/></svg>
+        </button>
+        <div id="settings-pop" class="menu" hidden>
+          <p class="menu-title">Cài đặt</p>
+          <button class="pref" type="button" data-pref="autoUpdate" role="switch" aria-checked="true">
+            <span class="pref-copy">
+              <strong>Tự cập nhật</strong>
+              <small>Có bản mới thì tự tắt Zalo, cài, rồi mở lại. Tắt thì bấm nút Cập nhật.</small>
+            </span>
+            <span class="knob" aria-hidden="true"></span>
+          </button>
+          <button class="pref" type="button" data-pref="efficiency" role="switch" aria-checked="true">
+            <span class="pref-copy">
+              <strong>Tiết kiệm RAM</strong>
+              <small>Sau 5 phút không dùng, hạ CPU và trả bớt RAM. Vẫn nhận tin và cuộc gọi.</small>
+            </span>
+            <span class="knob" aria-hidden="true"></span>
+          </button>
+          <button class="pref" type="button" data-pref="startWithWindows" role="switch" aria-checked="false">
+            <span class="pref-copy">
+              <strong>Khởi động cùng Windows</strong>
+              <small>Mở Zalo Due khi đăng nhập. Cửa sổ ẩn, icon nằm ở khay. Tài khoản bật Mở cùng máy chạy ẩn, bấm khay mới hiện.</small>
+            </span>
+            <span class="knob" aria-hidden="true"></span>
+          </button>
+          <p class="menu-note">Khay chỉ còn icon Due. Chuột phải icon đó, chọn tài khoản để mở.</p>
+        </div>
+      </div>
+      <div class="window-controls">
+        <button class="win-btn" type="button" data-window="min" aria-label="Thu nhỏ">
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h10" /></svg>
+        </button>
+        <button class="win-btn win-max" type="button" data-window="max" aria-label="Phóng to">
+          <svg class="icon-max" viewBox="0 0 12 12" aria-hidden="true"><rect x="1.5" y="1.5" width="9" height="9" /></svg>
+          <svg class="icon-restore" viewBox="0 0 12 12" aria-hidden="true"><rect x="3" y="1.5" width="7.5" height="7.5" /><path d="M1.5 3.5V10.5H8.5" /></svg>
+        </button>
+        <button class="win-btn win-close" type="button" data-window="close" aria-label="Ẩn xuống khay">
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2L2 10" /></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <div id="job" class="job" hidden>
+    <div class="job-bar" aria-hidden="true"><span id="job-fill"></span></div>
+    <p id="job-msg" aria-live="polite"></p>
+  </div>
+  <p id="banner" class="banner" role="status" hidden></p>
+  <main>
+    <section id="stage"></section>
+  </main>
+  <footer>
+    <p>Thông báo và cuộc gọi hiện tên cùng logo của từng tài khoản. Due không nhận mật khẩu.</p>
+  </footer>
+  <div id="modal" class="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h2 id="modal-title"></h2>
+      <p id="modal-body"></p>
+      <div class="modal-actions">
+        <button id="modal-cancel" class="btn btn-ghost" type="button">Hủy</button>
+        <button id="modal-ok" class="btn btn-primary" type="button">Xóa</button>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

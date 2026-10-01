@@ -1,0 +1,28 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Native build output
+native/build/
+
+# Microsoft Detours build output (rebuilt by native/build.ps1)
+third_party/Detours-4.0.1/lib.*/
+third_party/Detours-4.0.1/bin.*/
+third_party/Detours-4.0.1/**/obj.*/
+
+# Packaging
+build/
+dist/
+*.spec.bak
+
+# Runtime data: accounts, profiles, logs, downloaded Zalo
+/data/
+
+# Packaged app
+/Zalo Due.exe
+
+# Scratch downloads
+third_party/*.zip
+third_party/*.html
+third_party/*.json
